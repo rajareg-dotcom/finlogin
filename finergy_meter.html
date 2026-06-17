@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1A237E">
+<title>Finergy Meter — Finlogin Advisory</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+:root{
+  --navy:#1A237E;--gold:#F5A623;--violet:#3730A3;--lv:#EEF2FF;
+  --green:#16A34A;--lg:#DCFCE7;--red:#DC2626;--lr:#FEE2E2;
+  --orange:#F97316;--lo:#FFF7ED;
+  --text:#1e1e2e;--muted:#6b7280;--border:#e5e7eb;--bg:#F8F9FF;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100dvh;color:var(--text);overflow-x:hidden}
+#app{max-width:430px;margin:0 auto;min-height:100dvh;background:#fff}
+.screen{display:none;flex-direction:column;min-height:100dvh}
+.screen.active{display:flex}
+.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:80px}
+
+/* HEADER */
+.hdr{background:var(--navy);padding:14px 16px;display:flex;align-items:center;gap:12px;padding-top:max(14px,env(safe-area-inset-top));flex-shrink:0}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--navy);flex-shrink:0;font-family:'Nunito',sans-serif}
+.hdr-name{font-weight:800;font-size:14px;color:#fff;font-family:'Nunito',sans-serif}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.75)}
+.back-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:4px}
+
+/* TAB BAR */
+.tab-bar{display:flex;overflow-x:auto;background:#fff;border-bottom:2px solid var(--border);flex-shrink:0;-webkit-overflow-scrolling:touch}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab{padding:12px 14px;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:'Nunito',sans-serif}
+.tab.active{color:var(--navy);border-bottom-color:var(--gold);background:#fffbe6}
+
+/* KUDOS BANNER */
+.kudos-banner{background:#fff;padding:20px 16px;display:flex;align-items:center;gap:14px;border-bottom:.5px solid var(--border)}
+.kudos-img{width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,#F5A623,#fff3c0);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+.kudos-txt .k1{font-size:15px;color:var(--gold);font-weight:800;font-family:'Nunito',sans-serif}
+.kudos-txt .k2{font-size:15px;font-weight:800;color:var(--navy);font-family:'Nunito',sans-serif}
+.kudos-txt .k3{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+
+/* QUESTION CARDS */
+.qcard{background:#fff;border-radius:12px;border:.5px solid var(--border);padding:16px;margin:0 16px 12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.qcard h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.4}
+.qcard .qsub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.opt{display:flex;align-items:center;gap:12px;padding:14px;border-radius:10px;border:1.5px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600;width:100%;background:#fff;text-align:left;font-family:'DM Sans',sans-serif;color:var(--text)}
+.opt:last-child{margin-bottom:0}
+.opt.sel{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.opt-dot{width:22px;height:22px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.opt *{pointer-events:none}
+.opt.sel .opt-dot{background:var(--green);border-color:var(--green)}
+.opt.sel .opt-dot::after{content:'✓';color:#fff;font-size:12px;font-weight:900}
+.chk-opt{display:flex;align-items:center;gap:12px;padding:14px;border-radius:10px;border:1.5px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:600}
+.chk-opt.sel{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.chk-box{width:22px;height:22px;border-radius:6px;border:2px solid #ccc;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.chk-opt.sel .chk-box{background:var(--green);border-color:var(--green);color:#fff}
+
+/* FACT CHIP */
+.fact-chip{display:flex;gap:12px;align-items:flex-start;background:var(--lv);border-radius:10px;padding:12px;margin-top:12px}
+.fact-pct{font-size:22px;font-weight:900;color:var(--navy);font-family:'Nunito',sans-serif;flex-shrink:0;min-width:48px}
+.fact-txt{font-size:12px;color:var(--navy);line-height:1.5}
+
+/* BUTTONS */
+.btn-primary{background:var(--violet);color:#fff;border:none;border-radius:12px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;width:100%;font-family:'Nunito',sans-serif;transition:opacity .2s;min-height:52px}
+.btn-primary:hover{opacity:.9}
+.btn-gold{background:var(--gold);color:var(--navy);border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;width:100%;font-family:'Nunito',sans-serif;margin-top:10px}
+
+/* SECTION LABEL */
+.sec-lbl{font-size:11px;font-weight:800;color:var(--violet);letter-spacing:1px;text-transform:uppercase;padding:16px 16px 8px}
+
+/* FORM INPUTS */
+.form-group{margin:0 16px 14px}
+.form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px}
+.form-input{width:100%;padding:13px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border .2s;background:#fff}
+.form-input:focus{border-color:var(--violet)}
+
+/* VALIDATION */
+.form-input.field-error{border-color:var(--red)!important;background:#fff8f8}
+.opt.field-error-group{border-color:var(--red)!important;background:#fff8f8}
+.field-error-msg{font-size:11px;color:var(--red);font-weight:700;margin-top:4px;display:none}
+.field-error-msg.show{display:block}
+.field-error-label{color:var(--red)!important}
+.error-hint{background:var(--lr);border-radius:10px;padding:12px 14px;font-size:13px;font-weight:700;color:var(--red);margin:0 16px 12px;display:none;text-align:center}
+.error-hint.show{display:block}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.shake{animation:shake .4s ease}
+.dob-row{display:grid;grid-template-columns:80px 80px 1fr;gap:8px}
+
+/* GOAL CHECKBOXES */
+.goal-item{display:flex;align-items:center;gap:12px;padding:14px;border-radius:10px;border:.5px solid var(--border);background:#fff;margin-bottom:8px;cursor:pointer;transition:all .2s;font-weight:700;font-size:14px}
+.goal-item.checked{border-color:var(--violet);background:var(--lv)}
+.goal-chk{width:24px;height:24px;border-radius:6px;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:13px;color:transparent}
+.goal-item.checked .goal-chk{background:var(--violet);border-color:var(--violet);color:#fff}
+
+/* FINERGY SCORE SCREEN */
+.score-hero{background:linear-gradient(160deg,#0f1b5c 0%,#1A237E 50%,#0f1b5c 100%);padding:40px 24px 32px;text-align:center;position:relative;overflow:hidden}
+.score-stars{position:absolute;inset:0;pointer-events:none}
+.score-hi{font-size:22px;font-weight:900;color:#fff;font-family:'Nunito',sans-serif;margin-bottom:24px}
+.score-circle{width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;position:relative}
+.score-flag{font-size:40px;margin-bottom:4px}
+.score-label{font-size:14px;color:rgba(255,255,255,.8);margin-bottom:4px}
+.score-pct{font-size:44px;font-weight:900;color:var(--gold);font-family:'Nunito',sans-serif;line-height:1}
+.score-status-badge{display:inline-block;padding:6px 18px;border-radius:20px;font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;margin-top:8px}
+.badge-unhealthy{background:#EF4444;color:#fff}
+.badge-healthy{background:var(--green);color:#fff}
+.badge-warning{background:var(--orange);color:#fff}
+.score-scale{display:flex;gap:0;margin:16px 0 0}
+.scale-item{flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:11px;font-weight:700;font-family:'Nunito',sans-serif}
+.scale-red{background:#EF4444;color:#fff}
+.scale-orange{background:var(--orange);color:#fff}
+.scale-green{background:var(--green);color:#fff}
+.score-desc{background:rgba(255,255,255,.08);border-radius:12px;padding:16px;margin-top:16px;text-align:center}
+.score-desc p{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
+.score-desc span{font-size:12px;color:rgba(255,255,255,.8);line-height:1.5}
+
+/* RESULT CARDS */
+.result-card{background:var(--navy);border-radius:14px;padding:16px;margin:0 16px 12px;color:#fff}
+.rc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;cursor:pointer}
+.rc-left{display:flex;align-items:center;gap:10px}
+.rc-donut{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+.rc-title-sm{font-size:11px;color:var(--gold);font-weight:800;font-family:'Nunito',sans-serif;letter-spacing:.5px}
+.rc-title{font-size:16px;font-weight:800;color:#fff;font-family:'Nunito',sans-serif}
+.rc-score{font-size:22px;font-weight:900;color:var(--gold);font-family:'Nunito',sans-serif}
+.rc-badge{display:inline-block;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700;margin-top:4px}
+.rc-unhealthy{background:var(--red);color:#fff}
+.rc-healthy{background:var(--green);color:#fff}
+.rc-body{border-top:1px solid rgba(255,255,255,.15);margin-top:10px;padding-top:10px;display:none}
+.rc-body.open{display:block}
+.rc-stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid rgba(255,255,255,.1);font-size:13px}
+.rc-stat:last-child{border-bottom:none}
+.rc-stat-val{font-weight:700}
+.money-line{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;margin-top:10px}
+.money-icon{font-size:22px;flex-shrink:0}
+.money-amt{font-size:16px;font-weight:900;color:#fff;font-family:'Nunito',sans-serif}
+.money-lbl{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px}
+
+/* ACTION POINTS */
+.action-card{background:#fff;border-radius:12px;padding:14px;margin:0 16px 12px;border:.5px solid var(--border)}
+.action-title{background:var(--gold);color:var(--navy);display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;margin-bottom:12px}
+.action-item{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;font-size:13px;color:var(--text);line-height:1.5}
+.action-dot{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--navy);flex-shrink:0;margin-top:1px}
+
+/* PROTECTION BAR */
+.prot-bar-wrap{margin:10px 0}
+.prot-bar-track{height:12px;border-radius:6px;background:linear-gradient(90deg,#EF4444 0%,#F97316 40%,#22C55E 100%);position:relative;margin-bottom:6px}
+.prot-bar-dot{width:16px;height:16px;background:#fff;border:3px solid var(--red);border-radius:50%;position:absolute;top:50%;transform:translate(-50%,-50%)}
+.prot-bar-labels{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.8)}
+
+/* GRID STATS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.grid-stat{background:rgba(255,255,255,.08);border-radius:8px;padding:10px}
+.gs-lbl{font-size:11px;color:rgba(255,255,255,.7);margin-bottom:4px}
+.gs-val{font-size:13px;font-weight:700;color:#fff}
+.gs-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;margin-top:4px}
+
+/* SHARE BAR */
+.share-bar{background:var(--violet);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;font-size:14px;cursor:pointer;flex-shrink:0;padding-bottom:max(14px,env(safe-area-inset-bottom));font-family:'Nunito',sans-serif}
+
+/* CLIENT INFO MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:24px 20px 32px;max-height:90vh;overflow-y:auto}
+.modal h2{font-size:18px;font-weight:900;color:var(--navy);font-family:'Nunito',sans-serif;margin-bottom:4px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:18px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SCREEN 0: INTRO / CLIENT ENTRY -->
+<div class="screen active" id="s0">
+  <div class="hdr">
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">←</button>
+    <div class="avatar">FL</div>
+    <div>
+      <div class="hdr-name">Finlogin Advisory</div>
+      <div class="hdr-sub">Finergy Meter — Financial Health Score</div>
+    </div>
+  </div>
+  <div class="scroll-body">
+    <div class="kudos-banner">
+      <div class="kudos-img">⚡</div>
+      <div class="kudos-txt">
+        <div class="k1">Welcome to</div>
+        <div class="k2">Finergy Meter</div>
+        <div class="k3">Discover your client's Financial Health Score across Goals, Budget, Risk & Wealth</div>
+      </div>
+    </div>
+    <div style="padding:20px 16px">
+      <div class="sec-lbl" style="padding:0 0 12px">Client Details</div>
+      <div class="form-group" style="margin:0 0 14px">
+        <label class="form-label">Client Name</label>
+        <input class="form-input" id="client-name" placeholder="Enter client full name" tabindex="1" oninput="this.classList.remove('field-error');document.getElementById('s0-err').classList.remove('show')">
+      </div>
+      <div class="form-group" style="margin:0 0 14px">
+        <label class="form-label">Date of Birth</label>
+        <div class="dob-row">
+          <input class="form-input" id="dob-d" type="number" placeholder="DD" min="1" max="31" tabindex="2" maxlength="2"
+            oninput="this.classList.remove('field-error');if(this.value.length>=2){document.getElementById('dob-m').focus()}">
+          <input class="form-input" id="dob-m" type="number" placeholder="MM" min="1" max="12" tabindex="3" maxlength="2"
+            oninput="this.classList.remove('field-error');if(this.value.length>=2){document.getElementById('dob-y').focus()}">
+          <input class="form-input" id="dob-y" type="number" placeholder="YYYY" min="1950" max="2005" tabindex="4" maxlength="4"
+            oninput="this.classList.remove('field-error');if(this.value.length>=4){document.getElementById('client-mobile').focus()}">
+        </div>
+      </div>
+      <div class="form-group" style="margin:0 0 14px">
+        <label class="form-label">Mobile Number (without + sign)</label>
+        <input class="form-input" id="client-mobile" type="tel"
+          placeholder="91XXXXXXXXXX"
+          tabindex="5"
+          maxlength="12">
+      </div>
+      <div class="form-group" style="margin:0 0 14px">
+        <label class="form-label">Married or Single?</label>
+        <button type="button" class="opt" id="opt-married" tabindex="6"
+          onclick="selSingle('marital','married')">
+          <div class="opt-dot"></div>Married
+        </button>
+        <button type="button" class="opt" id="opt-single" tabindex="7"
+          onclick="selSingle('marital','single')">
+          <div class="opt-dot"></div>Single
+        </button>
+      </div>
+      <div class="form-group" style="margin:0 0 14px">
+        <label class="form-label">Number of Kids</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="kids-opt">
+          <button type="button" class="opt" style="flex:none;width:56px;justify-content:center" tabindex="8" onclick="selSingle('kids','0')">0</button>
+          <button type="button" class="opt" style="flex:none;width:56px;justify-content:center" tabindex="9" onclick="selSingle('kids','1')">1</button>
+          <button type="button" class="opt" style="flex:none;width:56px;justify-content:center" tabindex="10" onclick="selSingle('kids','2')">2</button>
+          <button type="button" class="opt" style="flex:none;width:56px;justify-content:center" tabindex="11" onclick="selSingle('kids','3')">3</button>
+          <button type="button" class="opt" style="flex:none;width:56px;justify-content:center" tabindex="12" onclick="selSingle('kids','4')">4</button>
+          <button type="button" class="opt" style="flex:none;width:56px;justify-content:center" tabindex="13" onclick="selSingle('kids','5')">5</button>
+        </div>
+      </div>
+      <div class="form-group" style="margin:0 0 14px">
+        <label class="form-label">Your House is</label>
+        <button type="button" class="opt" id="opt-own" tabindex="14"
+          onclick="selSingle('house','own')">
+          <div class="opt-dot"></div>Own
+        </button>
+        <button type="button" class="opt" id="opt-rented" tabindex="15"
+          onclick="selSingle('house','rented')">
+          <div class="opt-dot"></div>Rented
+        </button>
+      </div>
+      <div class="form-group" style="margin:0 0 14px">
+        <label class="form-label">Salaried or Business?</label>
+        <button type="button" class="opt" id="opt-salaried" tabindex="16"
+          onclick="selSingle('employ','salaried')">
+          <div class="opt-dot"></div>Salaried
+        </button>
+        <button type="button" class="opt" id="opt-business" tabindex="17"
+          onclick="selSingle('employ','business')">
+          <div class="opt-dot"></div>Business
+        </button>
+      </div>
+      <div class="form-group" style="margin:0 0 20px">
+        <label class="form-label">Total Monthly Income (all sources)</label>
+        <div style="position:relative">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted)">₹</span>
+          <input class="form-input" id="income" type="number"
+            placeholder="100000"
+            style="padding-left:28px"
+            tabindex="18"
+            oninput="this.classList.remove('field-error')">
+        </div>
+      </div>
+      <div class="error-hint" id="s0-err">⚠️ Please fill in all required fields above</div>
+      <button class="btn-primary" onclick="goToGoals()">Next: Select Goals →</button>
+      <div style="height:80px"></div>
+    </div>
+  </div>
+  <div class="share-bar" onclick="window.location.href='dashboard.html'">← Back to Dashboard</div>
+</div>
+
+<!-- SCREEN 1: GOALS -->
+<div class="screen" id="s1">
+  <div class="hdr">
+    <button class="back-btn" onclick="go('s0')">←</button>
+    <div class="avatar">FL</div>
+    <div><div class="hdr-name">Finergy Meter</div><div class="hdr-sub">Step 1 of 5 — Goals</div></div>
+  </div>
+  <div style="background:var(--gold);padding:8px 16px;text-align:center;font-weight:800;font-size:12px;color:var(--navy);letter-spacing:.5px">GOALS SELECTION</div>
+  <div class="scroll-body">
+    <div class="kudos-banner" id="kudos1">
+      <div class="kudos-img">🎯</div>
+      <div class="kudos-txt"><div class="k1">Kudos</div><div class="k2" id="k-name1">Client</div><div class="k3">on taking your first step towards your financial well-being.</div></div>
+    </div>
+    <div class="sec-lbl">Select Financial Goals</div>
+    <div style="padding:0 16px 8px;font-size:13px;color:var(--muted)">Select all that apply</div>
+    <div style="padding:0 16px">
+      <div class="goal-item" id="g-retirement" onclick="toggleGoal('retirement')"><div class="goal-chk">✓</div>Build fund for retirement</div>
+      <div class="goal-item" id="g-education" onclick="toggleGoal('education')"><div class="goal-chk">✓</div>Save for child's education</div>
+      <div class="goal-item" id="g-travel" onclick="toggleGoal('travel')"><div class="goal-chk">✓</div>Trip abroad with family</div>
+      <div class="goal-item" id="g-loan" onclick="toggleGoal('loan')"><div class="goal-chk">✓</div>Pay off loans</div>
+      <div class="goal-item" id="g-rental" onclick="toggleGoal('rental')"><div class="goal-chk">✓</div>Generate rental income</div>
+      <div class="goal-item" id="g-marriage" onclick="toggleGoal('marriage')"><div class="goal-chk">✓</div>Save for marriage</div>
+    </div>
+    <!-- Education sub-inputs -->
+    <div id="edu-inputs" style="display:none;padding:0 16px;margin-top:8px">
+      <div class="qcard">
+        <h3>Child Education Details</h3>
+        <div class="qsub">For each child, enter age and desired degree</div>
+        <div id="child-inputs-container"></div>
+      </div>
+    </div>
+    <!-- Retirement sub-inputs -->
+    <div id="ret-inputs" style="display:none;padding:0 16px;margin-top:8px">
+      <div class="qcard">
+        <h3>Retirement Details</h3>
+        <label class="form-label" style="margin-top:8px">Target Retirement Age</label>
+        <input class="form-input" id="ret-age" type="number" placeholder="e.g. 55" style="margin-bottom:12px">
+        <label class="form-label">Current Monthly Expenses (₹)</label>
+        <div style="position:relative"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted)">₹</span>
+        <input class="form-input" id="ret-exp" type="number" placeholder="50000" style="padding-left:28px"></div>
+      </div>
+    </div>
+    <div style="padding:16px">
+      <div class="error-hint" id="s1-err">⚠️ Please select at least one financial goal</div>
+      <button class="btn-primary" onclick="go('s2')">Next: Basic Info →</button>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: BUDGET MANAGEMENT -->
+<div class="screen" id="s2">
+  <div class="hdr">
+    <button class="back-btn" onclick="go('s1')">←</button>
+    <div class="avatar">FL</div>
+    <div><div class="hdr-name">Finergy Meter</div><div class="hdr-sub">Step 2 of 5 — Budget Management</div></div>
+  </div>
+  <div style="background:var(--gold);padding:8px 16px;text-align:center;font-weight:800;font-size:12px;color:var(--navy)">BUDGET MANAGEMENT</div>
+  <div class="scroll-body">
+    <div style="background:var(--navy);padding:14px 16px;text-align:center;color:#fff;font-size:13px;line-height:1.5">
+      In this section, we analyse your income and spending habits and tell you how much you should spend on your needs and wants.
+    </div>
+    <!-- Q1: Needs monthly -->
+    <div class="sec-lbl">NEEDS (Monthly Budget)</div>
+    <div id="budget-questions"></div>
+    <div style="padding:0 16px 16px">
+      <div class="error-hint" id="s2-err">⚠️ Please answer all budget questions above</div>
+      <button class="btn-primary" onclick="go('s3')">Next: Risk Management →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: RISK MANAGEMENT -->
+<div class="screen" id="s3">
+  <div class="hdr">
+    <button class="back-btn" onclick="go('s2')">←</button>
+    <div class="avatar">FL</div>
+    <div><div class="hdr-name">Finergy Meter</div><div class="hdr-sub">Step 3 of 5 — Risk Management</div></div>
+  </div>
+  <div style="background:var(--gold);padding:8px 16px;text-align:center;font-weight:800;font-size:12px;color:var(--navy)">RISK MANAGEMENT</div>
+  <div class="scroll-body">
+    <div style="background:var(--navy);padding:14px 16px;color:#fff;font-size:13px;line-height:1.5;text-align:center">
+      This section will help us understand whether you prepare for Financial risks that may arise in the future.
+    </div>
+    <div id="risk-questions"></div>
+    <div style="padding:0 16px 16px">
+      <div class="error-hint" id="s3-err">⚠️ Please answer all risk management questions</div>
+      <button class="btn-primary" onclick="go('s4')">Next: Wealth Management →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: WEALTH MANAGEMENT -->
+<div class="screen" id="s4">
+  <div class="hdr">
+    <button class="back-btn" onclick="go('s3')">←</button>
+    <div class="avatar">FL</div>
+    <div><div class="hdr-name">Finergy Meter</div><div class="hdr-sub">Step 4 of 5 — Wealth Management</div></div>
+  </div>
+  <div style="background:var(--gold);padding:8px 16px;text-align:center;font-weight:800;font-size:12px;color:var(--navy)">WEALTH MANAGEMENT</div>
+  <div class="scroll-body">
+    <div style="background:var(--navy);padding:14px 16px;color:#fff;font-size:13px;line-height:1.5;text-align:center">
+      🏁 Let's get started<br><span style="font-size:12px;opacity:.8">This section will help us check whether you're converting your Earnings into Wealth.</span>
+    </div>
+    <div id="wealth-questions"></div>
+    <div style="padding:0 16px 16px">
+      <div class="error-hint" id="s4-err">⚠️ Please answer all wealth management questions</div>
+      <button class="btn-primary" onclick="calculateFinergy()">⚡ Calculate Finergy Score</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: RESULTS -->
+<div class="screen" id="s5">
+  <div class="hdr">
+    <button class="back-btn" onclick="go('s0')">←</button>
+    <div class="avatar">FL</div>
+    <div><div class="hdr-name">Finergy Meter</div><div class="hdr-sub">Your Financial Health Report</div></div>
+  </div>
+  <div class="scroll-body">
+    <!-- SCORE HERO -->
+    <div class="score-hero">
+      <div class="score-hi">Hi <span id="res-name">Client</span></div>
+      <div class="score-circle">
+        <div class="score-flag">🏁</div>
+        <div class="score-label">Your Finergy level is</div>
+        <div class="score-pct" id="res-score">64%</div>
+      </div>
+      <div><span class="score-status-badge badge-unhealthy" id="res-status-badge">Unhealthy</span></div>
+      <div class="score-scale">
+        <div class="scale-item scale-red">Unhealthy<br>0-40</div>
+        <div class="scale-item scale-orange" style="margin:0 4px">Unhealthy<br>41-69</div>
+        <div class="scale-item scale-green">Healthy<br>70-100</div>
+      </div>
+      <div class="score-desc">
+        <p id="res-score-title">This is an average score considering your age.</p>
+        <span id="res-score-desc">Finergy is your financial Fitness score based on how you spend and save your money.</span>
+      </div>
+    </div>
+
+    <!-- GOAL RESULTS -->
+    <div class="sec-lbl">YOUR FINANCIAL GOALS</div>
+    <div id="goal-results"></div>
+
+    <!-- BUDGET RESULT -->
+    <div class="sec-lbl">BUDGET MANAGEMENT</div>
+    <div id="budget-result"></div>
+
+    <!-- RISK RESULT -->
+    <div class="sec-lbl">RISK MANAGEMENT</div>
+    <div id="risk-result"></div>
+
+    <!-- WEALTH RESULT -->
+    <div class="sec-lbl">WEALTH MANAGEMENT</div>
+    <div id="wealth-result"></div>
+
+    <!-- ADVISOR NOTE -->
+    <div style="margin:0 16px 16px;background:var(--lv);border-radius:12px;padding:16px;font-size:13px;color:var(--navy);line-height:1.6;border-left:4px solid var(--violet)">
+      As your financial advisor, I will upload a comprehensive report within 48 hours here, outlining strategies to help you achieve your financial goals.
+    </div>
+
+    <!-- BUTTONS -->
+    <div style="padding:0 16px 20px">
+      <button class="btn-primary" onclick="generateReport()">📄 Download PDF Report</button>
+      <button class="btn-gold" onclick="shareWA()">💬 Share on WhatsApp</button>
+    </div>
+  </div>
+  <div class="share-bar" onclick="window.location.href='dashboard.html'">← Back to Dashboard</div>
+</div>
+
+</div><!-- end app -->
+
+<script>
+// ===== STATE =====
+const state = {
+  client:{name:'',dob:'',mobile:'',marital:'',kids:'0',house:'',employ:'',income:0},
+  goals:[],
+  goalDetails:{retAge:60,retExp:50000,children:[]},
+  budget:{},
+  risk:{},
+  wealth:{},
+  scores:{}
+};
+
+// ===== NAVIGATION — single go() defined later after buildBudget/Risk/Wealth =====
+
+// ===== SELECTORS =====
+function selSingle(group,val){
+  const map={
+    marital:['opt-married','opt-single'],
+    house:['opt-own','opt-rented'],
+    employ:['opt-salaried','opt-business']
+  };
+  if(group==='kids'){
+    document.querySelectorAll('#kids-opt button.opt').forEach(el=>el.classList.remove('sel'));
+    // find the button with matching text
+    document.querySelectorAll('#kids-opt button.opt').forEach(el=>{
+      if(el.textContent.trim()===val) el.classList.add('sel');
+    });
+    state.client.kids=val;
+    return;
+  }
+  if(map[group]){
+    map[group].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.classList.remove('sel');
+    });
+  }
+  const el=document.getElementById('opt-'+val);
+  if(el) el.classList.add('sel');
+  state.client[group]=val;
+}
+
+function toggleGoal(g){
+  const el=document.getElementById('g-'+g);
+  const idx=state.goals.indexOf(g);
+  if(idx>-1){state.goals.splice(idx,1);el.classList.remove('checked')}
+  else{state.goals.push(g);el.classList.add('checked')}
+  // Show/hide sub-inputs
+  document.getElementById('edu-inputs').style.display=state.goals.includes('education')?'block':'none';
+  document.getElementById('ret-inputs').style.display=state.goals.includes('retirement')?'block':'none';
+  // Rebuild child inputs
+  if(state.goals.includes('education')) buildChildInputs();
+}
+
+function buildChildInputs(){
+  const kids=parseInt(state.client.kids)||1;
+  const deg=['MBA','MBBS','Engineering','CA','Other PG'];
+  const c=document.getElementById('child-inputs-container');
+  c.innerHTML=Array.from({length:kids},(_,i)=>`
+    <div style="margin-bottom:14px;padding:12px;background:var(--lv);border-radius:8px">
+      <div style="font-size:13px;font-weight:700;color:var(--violet);margin-bottom:8px">Child ${i+1}</div>
+      <label class="form-label">Child's Name <span style="color:var(--red)">*</span></label>
+      <input class="form-input" id="child-name-${i}" type="text" placeholder="e.g. Arjun" style="margin-bottom:10px">
+      <label class="form-label">Age <span style="color:var(--red)">*</span></label>
+      <input class="form-input" id="child-age-${i}" type="number" placeholder="e.g. 5" style="margin-bottom:10px">
+      <label class="form-label">Degree</label>
+      <select class="form-input" id="child-deg-${i}" style="font-size:16px">
+        ${deg.map(d=>`<option>${d}</option>`).join('')}
+      </select>
+    </div>`).join('');
+}
+
+// ===== BUDGET QUESTIONS =====
+const BUDGET_QS=[
+  {id:'household',label:'Household Expenses',sub:'Includes groceries, milk, vegetables, domestic help, and other household expenses.',budget_pct:22.5,fact:'22.5% of income is the ideal household budget',factPct:'22%'},
+  {id:'transport',label:'Transport Cost',sub:'Includes fuel, car maintenance, travel fare and other transportation expenses.',budget_pct:10,fact:'Transportation cost should be within 10% of your income',factPct:'20%'},
+  {id:'emi',label:'Loan / EMI',sub:'Monthly EMI commitments for home, car, personal or any other loans.',budget_pct:25,fact:'of the population have taken loans due to financial compulsions',factPct:'65%'},
+  {id:'rent',label:'Rent',sub:'Monthly house rent, if applicable.',budget_pct:20,fact:'General rule: spend max 20% on rent',factPct:'20%'},
+  {id:'personal_care',label:'Personal Care',sub:'Includes gym, parlour/salon, cosmetics, clothing and personal grooming expenses.',budget_pct:3.5,fact:'quarter of all families prioritise personal care costs',factPct:'25%'},
+  {id:'entertainment',label:'Entertainment',sub:'OTT, movies, outings, events, clubs and leisure activities.',budget_pct:5,fact:'of urban households overspend on entertainment',factPct:'50%'},
+  {id:'eating_out',label:'Eating Out',sub:'Restaurants, food delivery, cafes and dining out expenses.',budget_pct:3,fact:'Indians spent ₹4.2 lakh crore on eating out in 2023',factPct:'80%'},
+];
+
+const RISK_QS=[
+  {id:'emergency_fund',label:'Do you have at least ₹1,95,000 saved for emergency expenses?',sub:'In case of any financial emergency such as job loss or business loss, you need to have liquid funds to manage atleast 3 months of regular expenses.',fact:'of people say that they dread being in a situation to borrow money from friends/family in times of financial emergencies',factPct:'48%'},
+  {id:'disability',label:'Do you have disability insurance of at least ₹50,00,000?',sub:'Your family should ideally save approximately 50 times your monthly income for any disability that may leave you unable to work.',fact:'India tops the world ranking with 11% of global death in road accidents',factPct:'11%'},
+  {id:'term_plan',label:'Do you have a term plan of at least ₹1,00,00,000 in case of premature death?',sub:'Your family should have term insurance of at least 100 times the monthly income as a safety net for your family.',fact:'of Indians have bought Life insurance coverage post-pandemic',factPct:'16%'},
+  {id:'health_ins',label:'Do you have health insurance coverage of at least ₹10,00,000?',sub:'A medical emergency can wipe out your savings overnight without adequate health insurance.',fact:'of people compromise on health treatment due to financial pressure',factPct:'35%'},
+  {id:'annuity',label:'Do you have an Annuity Insurance Plan for safeguarding your retirement phase?',sub:'Annuity Insurance plans provide you with fixed pension per month upto 99 yrs Age post your retirement.',fact:'of people have to depend on their children for money during their retirement phase',factPct:'57%'},
+];
+
+const WEALTH_QS=[
+  {id:'sip',label:'Are you investing ₹5,000 in Monthly SIPs?',sub:'Ideally, you should invest 5% of your total monthly salary in an SIP.',fact:'of Indians are unaware of how much to put aside or invest in order to achieve financial freedom',factPct:'72%'},
+  {id:'savings',label:'Are you able to save at least ₹15,000 in either cash or in your bank account after all your commitments?',sub:'Ideally, you should save 15% of your total monthly salary.',fact:'of Indian consumers have increased their savings and investments post-pandemic',factPct:'70%'},
+  {id:'rental',label:'Do you have an existing source of rental income?',sub:'Having a rental income provides a stable passive income stream.',fact:'In 2021 India reported a rental income of 27.5 billion rupees from office spaces.',factPct:'₹27.5B'},
+];
+
+const ASSET_OPTIONS=['Commercial','Plot','Apartment','None'];
+
+function buildBudgetQuestions(){
+  const c=document.getElementById('budget-questions');
+  const income=parseFloat(document.getElementById('income').value)||100000;
+  c.innerHTML=BUDGET_QS.map(q=>{
+    const budget=Math.round(income*q.budget_pct/100);
+    return `<div class="qcard">
+      <h3>${q.label}</h3>
+      <div class="qsub">${q.sub}<br><strong>Your Budget: ₹${budget.toLocaleString('en-IN')}/month</strong></div>
+      <div class="opt" id="bq-yes-${q.id}" onclick="selBudget('${q.id}','yes')"><div class="opt-dot"></div>Yes, within budget</div>
+      <div class="opt" id="bq-no-${q.id}" onclick="selBudget('${q.id}','no')"><div class="opt-dot"></div>No, over budget</div>
+      <div class="fact-chip">
+        <div class="fact-pct">${q.factPct}</div>
+        <div class="fact-txt">${q.fact}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selBudget(id,val){
+  document.getElementById('bq-yes-'+id).classList.toggle('sel',val==='yes');
+  document.getElementById('bq-no-'+id).classList.toggle('sel',val==='no');
+  state.budget[id]=val;
+}
+
+function buildRiskQuestions(){
+  const c=document.getElementById('risk-questions');
+  c.innerHTML=RISK_QS.map(q=>`
+    <div class="qcard">
+      <h3>${q.label}</h3>
+      <div class="qsub">${q.sub}</div>
+      <div class="opt" id="rq-yes-${q.id}" onclick="selRisk('${q.id}','yes')"><div class="opt-dot"></div>Yes</div>
+      <div class="opt" id="rq-no-${q.id}" onclick="selRisk('${q.id}','no')"><div class="opt-dot"></div>No</div>
+      <div class="fact-chip">
+        <div class="fact-pct">${q.factPct}</div>
+        <div class="fact-txt">${q.fact}</div>
+      </div>
+    </div>`).join('');
+}
+
+function selRisk(id,val){
+  document.getElementById('rq-yes-'+id).classList.toggle('sel',val==='yes');
+  document.getElementById('rq-no-'+id).classList.toggle('sel',val==='no');
+  state.risk[id]=val;
+}
+
+function buildWealthQuestions(){
+  const c=document.getElementById('wealth-questions');
+  let html=WEALTH_QS.map(q=>`
+    <div class="qcard">
+      <h3>${q.label}</h3>
+      <div class="qsub">${q.sub}</div>
+      <div class="opt" id="wq-yes-${q.id}" onclick="selWealth('${q.id}','yes')"><div class="opt-dot"></div>Yes</div>
+      <div class="opt" id="wq-no-${q.id}" onclick="selWealth('${q.id}','no')"><div class="opt-dot"></div>No</div>
+      <div class="fact-chip">
+        <div class="fact-pct">${q.factPct}</div>
+        <div class="fact-txt">${q.fact}</div>
+      </div>
+    </div>`).join('');
+  // Assets question
+  html+=`<div class="qcard">
+    <h3>Do you own any of the below-mentioned assets?</h3>
+    <div class="qsub">Select all that apply</div>
+    ${ASSET_OPTIONS.map(a=>`<div class="chk-opt" id="asset-${a.toLowerCase()}" onclick="toggleAsset('${a}')"><div class="chk-box">✓</div>${a}</div>`).join('')}
+    <div class="fact-chip">
+      <div class="fact-pct">40%</div>
+      <div class="fact-txt">of investors calculate their returns on immovable assets without understanding inflation and opportunity costs</div>
+    </div>
+  </div>`;
+  c.innerHTML=html;
+}
+
+function selWealth(id,val){
+  document.getElementById('wq-yes-'+id).classList.toggle('sel',val==='yes');
+  document.getElementById('wq-no-'+id).classList.toggle('sel',val==='no');
+  state.wealth[id]=val;
+}
+
+const selectedAssets=[];
+function toggleAsset(a){
+  const el=document.getElementById('asset-'+a.toLowerCase());
+  if(a==='None'){
+    // deselect others
+    selectedAssets.length=0;
+    ASSET_OPTIONS.forEach(x=>document.getElementById('asset-'+x.toLowerCase()).classList.remove('sel'));
+    el.classList.add('sel');
+    selectedAssets.push('None');
+    return;
+  }
+  const idx=selectedAssets.indexOf(a);
+  if(idx>-1){selectedAssets.splice(idx,1);el.classList.remove('sel')}
+  else{
+    // remove None
+    const ni=selectedAssets.indexOf('None');
+    if(ni>-1){selectedAssets.splice(ni,1);document.getElementById('asset-none').classList.remove('sel')}
+    selectedAssets.push(a);el.classList.add('sel');
+  }
+}
+
+// ===== VALIDATION HELPERS =====
+function flashError(errId, scrollToId){
+  const errEl=document.getElementById(errId);
+  if(errEl){errEl.classList.add('show');errEl.classList.add('shake');setTimeout(()=>errEl.classList.remove('shake'),500)}
+  if(scrollToId){const el=document.getElementById(scrollToId);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})}
+}
+function clearErrors(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('field-error');el.classList.remove('field-error-group')}})}
+function markError(id){const el=document.getElementById(id);if(el){el.classList.add('field-error');el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),500)}}
+function markOptGroupError(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('field-error-group')})}
+function clearAllS0Errors(){
+  ['client-name','dob-d','dob-m','dob-y'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('field-error')});
+  ['opt-married','opt-single','opt-own','opt-rented','opt-salaried','opt-business'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('field-error-group')});
+  const e=document.getElementById('s0-err');if(e)e.classList.remove('show');
+}
+
+// ===== NAVIGATION FROM S0 =====
+function goToGoals(){
+  clearAllS0Errors();
+  let firstErr=null;
+  let hasErr=false;
+
+  const name=document.getElementById('client-name').value.trim();
+  if(!name){markError('client-name');if(!firstErr)firstErr='client-name';hasErr=true;}
+
+  const dd=parseInt(document.getElementById('dob-d').value);
+  const dm=parseInt(document.getElementById('dob-m').value);
+  const dy=parseInt(document.getElementById('dob-y').value);
+  if(!dd||dd<1||dd>31){markError('dob-d');if(!firstErr)firstErr='dob-d';hasErr=true;}
+  if(!dm||dm<1||dm>12){markError('dob-m');if(!firstErr)firstErr='dob-m';hasErr=true;}
+  if(!dy||dy<1940||dy>2010){markError('dob-y');if(!firstErr)firstErr='dob-y';hasErr=true;}
+
+  if(!state.client.marital){markOptGroupError(['opt-married','opt-single']);if(!firstErr)firstErr='opt-married';hasErr=true;}
+  if(!state.client.house){markOptGroupError(['opt-own','opt-rented']);if(!firstErr&&!state.client.marital)firstErr='opt-own';else if(!firstErr)firstErr='opt-own';hasErr=true;}
+  if(!state.client.employ){markOptGroupError(['opt-salaried','opt-business']);if(!firstErr)firstErr='opt-salaried';hasErr=true;}
+
+  const incomeVal=document.getElementById('income').value.trim();
+  if(!incomeVal||parseFloat(incomeVal)<=0){markError('income');if(!firstErr)firstErr='income';hasErr=true;}
+
+  if(hasErr){
+    flashError('s0-err');
+    if(firstErr){const el=document.getElementById(firstErr);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})}
+    return;
+  }
+
+  state.client.name=name;
+  state.client.income=parseFloat(incomeVal)||100000;
+  state.client.dob=`${String(dd).padStart(2,'0')}-${String(dm).padStart(2,'0')}-${dy}`;
+  state.client.dobYear=dy;
+  state.client.dobMonth=dm;
+  state.client.dobDay=dd;
+  const today=new Date();
+  let age=today.getFullYear()-dy;
+  if(today.getMonth()+1<dm||(today.getMonth()+1===dm&&today.getDate()<dd))age--;
+  state.client.age=age;
+  state.client.mobile=document.getElementById('client-mobile').value;
+  document.getElementById('k-name1').textContent=name;
+  buildChildInputs();
+  go('s1');
+}
+
+// Override go to validate + build budget/risk/wealth questions
+function go(id){
+  const current=document.querySelector('.screen.active');
+  const cid=current?current.id:null;
+
+  // Validate before leaving s1
+  if(id==='s2'&&cid==='s1'){
+    const errEl=document.getElementById('s1-err');
+    // Must select at least one goal
+    if(state.goals.length===0){
+      if(errEl)errEl.classList.add('show');
+      document.querySelector('#s1 .scroll-body').scrollTo({top:0,behavior:'smooth'});
+      return;
+    }
+    // If education selected, check child names + ages filled
+    if(state.goals.includes('education')){
+      const kids=parseInt(state.client.kids)||1;
+      let childErr=false;
+      for(let i=0;i<kids;i++){
+        const nm=document.getElementById('child-name-'+i);
+        const ag=document.getElementById('child-age-'+i);
+        if(!nm?.value.trim()){if(nm){nm.classList.add('field-error');nm.classList.add('shake');setTimeout(()=>nm.classList.remove('shake'),500)}childErr=true;}
+        if(!ag?.value||parseInt(ag.value)<1){if(ag){ag.classList.add('field-error');ag.classList.add('shake');setTimeout(()=>ag.classList.remove('shake'),500)}childErr=true;}
+      }
+      if(childErr){
+        if(errEl){errEl.textContent='⚠️ Please fill in all child details (name & age)';errEl.classList.add('show');}
+        document.getElementById('edu-inputs')?.scrollIntoView({behavior:'smooth',block:'center'});
+        return;
+      }
+    }
+    if(errEl)errEl.classList.remove('show');
+    if(errEl)errEl.textContent='⚠️ Please select at least one financial goal';
+  }
+
+  // Validate before leaving s2
+  if(id==='s3'&&cid==='s2'){
+    const unanswered=BUDGET_QS.filter(q=>!state.budget[q.id]);
+    const errEl=document.getElementById('s2-err');
+    if(unanswered.length>0){
+      if(errEl)errEl.classList.add('show');
+      // Highlight first unanswered
+      const firstQ=document.getElementById('bq-yes-'+unanswered[0].id);
+      if(firstQ)firstQ.closest('.qcard')?.scrollIntoView({behavior:'smooth',block:'center'});
+      // Shake unanswered cards
+      unanswered.forEach(q=>{
+        const card=document.getElementById('bq-yes-'+q.id)?.closest('.qcard');
+        if(card){card.style.border='1.5px solid var(--red)';card.classList.add('shake');setTimeout(()=>{card.classList.remove('shake');card.style.border=''},500)}
+      });
+      return;
+    }
+    if(errEl)errEl.classList.remove('show');
+  }
+
+  // Validate before leaving s3
+  if(id==='s4'&&cid==='s3'){
+    const unanswered=RISK_QS.filter(q=>!state.risk[q.id]);
+    const errEl=document.getElementById('s3-err');
+    if(unanswered.length>0){
+      if(errEl)errEl.classList.add('show');
+      const firstQ=document.getElementById('rq-yes-'+unanswered[0].id);
+      if(firstQ)firstQ.closest('.qcard')?.scrollIntoView({behavior:'smooth',block:'center'});
+      unanswered.forEach(q=>{
+        const card=document.getElementById('rq-yes-'+q.id)?.closest('.qcard');
+        if(card){card.style.border='1.5px solid var(--red)';card.classList.add('shake');setTimeout(()=>{card.classList.remove('shake');card.style.border=''},500)}
+      });
+      return;
+    }
+    if(errEl)errEl.classList.remove('show');
+  }
+
+  // Build next screen data
+  if(id==='s2') buildBudgetQuestions();
+  if(id==='s3') buildRiskQuestions();
+  if(id==='s4') buildWealthQuestions();
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ===== SCORING ENGINE =====
+function calculateFinergy(){
+  // Validate wealth questions
+  const wUnanswered=WEALTH_QS.filter(q=>!state.wealth[q.id]);
+  const s4err=document.getElementById('s4-err');
+  if(wUnanswered.length>0){
+    if(s4err)s4err.classList.add('show');
+    const firstQ=document.getElementById('wq-yes-'+wUnanswered[0].id);
+    if(firstQ)firstQ.closest('.qcard')?.scrollIntoView({behavior:'smooth',block:'center'});
+    wUnanswered.forEach(q=>{
+      const card=document.getElementById('wq-yes-'+q.id)?.closest('.qcard');
+      if(card){card.style.border='1.5px solid var(--red)';card.classList.add('shake');setTimeout(()=>{card.classList.remove('shake');card.style.border=''},500)}
+    });
+    return;
+  }
+  if(s4err)s4err.classList.remove('show');
+  // Collect child details
+  if(state.goals.includes('education')){
+    const kids=parseInt(state.client.kids)||1;
+    state.goalDetails.children=Array.from({length:kids},(_,i)=>({
+      name:document.getElementById('child-name-'+i)?.value.trim()||`Child ${i+1}`,
+      age:parseInt(document.getElementById('child-age-'+i)?.value)||5,
+      degree:document.getElementById('child-deg-'+i)?.value||'MBA'
+    }));
+  }
+  state.goalDetails.retAge=parseInt(document.getElementById('ret-age')?.value)||60;
+  state.goalDetails.retExp=parseFloat(document.getElementById('ret-exp')?.value)||50000;
+  state.wealth.assets=selectedAssets;
+
+  // SCORE CALCULATION
+  const income=state.client.income;
+
+  // Budget score: each within budget = +1
+  let budgetScore=0;
+  BUDGET_QS.forEach(q=>{if(state.budget[q.id]==='yes')budgetScore++;});
+  const budgetPct=Math.round(budgetScore/BUDGET_QS.length*100);
+
+  // Risk score
+  let riskScore=0;
+  RISK_QS.forEach(q=>{if(state.risk[q.id]==='yes')riskScore++;});
+  const riskPct=Math.round(riskScore/RISK_QS.length*100);
+
+  // Wealth score
+  let wealthScore=0;
+  WEALTH_QS.forEach(q=>{if(state.wealth[q.id]==='yes')wealthScore++;});
+  if(selectedAssets.length>0&&!selectedAssets.includes('None'))wealthScore++;
+  const wealthPct=Math.round(wealthScore/(WEALTH_QS.length+1)*100);
+
+  // Goal scores
+  const goalScores={};
+  const dob=parseInt(document.getElementById('dob-y').value)||1990;
+  const age=state.client.age||( new Date().getFullYear()-dob);
+  if(state.goals.includes('retirement')){
+    const retAge=state.goalDetails.retAge;
+    const yrs=Math.max(1,retAge-age);
+    let gs=40;
+    if(state.risk.health_ins==='yes')gs+=15;
+    if(state.risk.annuity==='yes')gs+=20;
+    if(state.wealth.sip==='yes')gs+=15;
+    if(state.wealth.savings==='yes')gs+=10;
+    goalScores.retirement=Math.min(gs,100);
+  }
+  if(state.goals.includes('education')){
+    let gs=30;
+    if(state.risk.term_plan==='yes')gs+=20;
+    if(state.risk.health_ins==='yes')gs+=10;
+    if(state.wealth.sip==='yes')gs+=20;
+    if(state.wealth.savings==='yes')gs+=10;
+    if(selectedAssets.length>0&&!selectedAssets.includes('None'))gs+=10;
+    goalScores.education=Math.min(gs,100);
+  }
+
+  // Overall Finergy Score
+  const finergy=Math.round((budgetPct*0.3)+(riskPct*0.3)+(wealthPct*0.3)+(age>40?-5:age>30?0:5)+50*0.1);
+  const finergyFinal=Math.min(Math.max(finergy,10),95);
+
+  state.scores={finergy:finergyFinal,budget:budgetPct,risk:riskPct,wealth:wealthPct,goals:goalScores};
+
+  buildResultScreen();
+  go('s5');
+}
+
+// ===== BUILD RESULTS =====
+function buildResultScreen(){
+  const {finergy,budget,risk,wealth,goals}=state.scores;
+  const name=state.client.name;
+  const income=state.client.income;
+  const age=state.client.age||(new Date().getFullYear()-parseInt(document.getElementById('dob-y').value||1990));
+
+  // Score hero
+  document.getElementById('res-name').textContent=name;
+  document.getElementById('res-score').textContent=finergy+'%';
+  const badge=document.getElementById('res-status-badge');
+  if(finergy>=70){badge.textContent='Healthy';badge.className='score-status-badge badge-healthy'}
+  else if(finergy>=41){badge.textContent='Unhealthy';badge.className='score-status-badge badge-warning'}
+  else{badge.textContent='Unhealthy';badge.className='score-status-badge badge-unhealthy'}
+  document.getElementById('res-score-title').textContent=finergy>=70?'Great score! You are in good financial health.':finergy>=41?'This is an average score considering your age.':'Your financial health needs immediate attention.';
+  document.getElementById('res-score-desc').textContent=`Finergy is your financial Fitness score based on how you spend and save your money. A score of ${finergy}% indicates that you are ${finergy>=70?'likely to achieve your dreams.':finergy>=41?'quite likely to achieve your dreams with some effort.':'at risk of not achieving your financial goals without action.'}`;
+
+  // GOAL RESULTS
+  const fees={MBA:{n:2310938,p:6897579},MBBS:{n:3500000,p:9000000},Engineering:{n:1200000,p:4500000},CA:{n:800000,p:1800000},'Other PG':{n:1500000,p:4000000}};
+  let grHTML='';
+  let goalNum=1;
+  if(state.goals.includes('retirement')){
+    const retAge=state.goalDetails.retAge;
+    const retExp=state.goalDetails.retExp;
+    const yrs=Math.max(1,retAge-age);
+    const futureExp=Math.round(retExp*Math.pow(1.06,yrs));
+    const corpus=Math.round(futureExp*12*20);
+    const gsc=goals.retirement||40;
+    const healthyClass=gsc>=70?'rc-healthy':'rc-unhealthy';
+    const statusTxt=gsc>=70?'Healthy':'Unhealthy';
+    grHTML+=`
+    <div class="result-card">
+      <div class="rc-header" onclick="toggleRC('ret-body')">
+        <div class="rc-left">
+          <div class="rc-donut" style="background:${gsc>=70?'rgba(22,163,74,.3)':'rgba(220,38,38,.3)'}">🏦</div>
+          <div>
+            <div class="rc-title-sm">GOAL ${goalNum}</div>
+            <div class="rc-title">Build fund for retirement</div>
+            <div><span class="rc-badge ${healthyClass}">${statusTxt}</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="rc-score">${gsc}%</div>
+          <div style="color:#fff;font-size:18px">∨</div>
+        </div>
+      </div>
+      <div class="rc-body" id="ret-body">
+        <div class="rc-stat"><span style="color:rgba(255,255,255,.7)">Uh oh! You're just ${gsc}% likely to complete your goal</span></div>
+        <div class="money-line">
+          <div class="money-icon">💰</div>
+          <div><div class="money-amt">Rs.${corpus.toLocaleString('en-IN')}</div><div class="money-lbl">Total funds you need at the age of ${retAge}</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="grid-stat"><div class="gs-lbl">Current Age</div><div class="gs-val">${age} yrs</div></div>
+          <div class="grid-stat"><div class="gs-lbl">Years in hand</div><div class="gs-val">${yrs} yrs</div></div>
+          <div class="grid-stat"><div class="gs-lbl">Monthly Expenses Now</div><div class="gs-val">₹${retExp.toLocaleString('en-IN')}</div></div>
+          <div class="grid-stat"><div class="gs-lbl">At Age ${retAge}</div><div class="gs-val">₹${futureExp.toLocaleString('en-IN')}</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="action-title">Action points</div>
+      <div class="action-item"><div class="action-dot"></div>Invest Rs. ${Math.round(income*0.06).toLocaleString('en-IN')} in Pension Schemes like PPF</div>
+      <div class="action-item"><div class="action-dot"></div>Have a monthly SIP of at least Rs. ${Math.round(income*0.05).toLocaleString('en-IN')}</div>
+      <div class="action-item"><div class="action-dot"></div>Have Health Insurance Coverage of at least Rs. 10 lacs</div>
+    </div>`;
+    goalNum++;
+  }
+  if(state.goals.includes('education')&&state.goalDetails.children.length>0){
+    const gsc=goals.education||36;
+    const healthyClass=gsc>=70?'rc-healthy':'rc-unhealthy';
+    const statusTxt=gsc>=70?'Healthy':'Unhealthy';
+    const childCards=state.goalDetails.children.map((c,i)=>{
+      const yrs=Math.max(1,18-c.age);
+      const f=fees[c.degree]||fees.MBA;
+      const normal=Math.round(f.n*Math.pow(1.10,yrs));
+      const premier=Math.round(f.p*Math.pow(1.10,yrs));
+      const childLabel=c.name?c.name:`Child ${i+1}`;
+      return `<div style="background:rgba(255,255,255,.08);border-radius:8px;padding:12px;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold)">${childLabel}</div>
+        <div class="grid-2" style="margin-top:6px">
+          <div class="grid-stat"><div class="gs-lbl">Degree</div><div class="gs-val">${c.degree}</div></div>
+          <div class="grid-stat"><div class="gs-lbl">Years in hand</div><div class="gs-val">${yrs} yrs</div></div>
+          <div class="grid-stat"><div class="gs-lbl">Normal Fees</div><div class="gs-val">₹${normal.toLocaleString('en-IN')}</div></div>
+          <div class="grid-stat"><div class="gs-lbl">Premier Fees</div><div class="gs-val">₹${premier.toLocaleString('en-IN')}</div></div>
+        </div>
+        <div class="money-line" style="margin-top:8px">
+          <div class="money-icon">💰</div>
+          <div><div class="money-amt">Rs.${normal.toLocaleString('en-IN')}</div><div class="money-lbl">Total funds needed for ${childLabel}'s education</div></div>
+        </div>
+      </div>`;
+    }).join('');
+    grHTML+=`
+    <div class="result-card">
+      <div class="rc-header" onclick="toggleRC('edu-body')">
+        <div class="rc-left">
+          <div class="rc-donut" style="background:${gsc>=70?'rgba(22,163,74,.3)':'rgba(220,38,38,.3)'}">🎓</div>
+          <div>
+            <div class="rc-title-sm">GOAL ${goalNum}</div>
+            <div class="rc-title">Save for Child's Education</div>
+            <div><span class="rc-badge ${healthyClass}">${statusTxt}</span></div>
+          </div>
+        </div>
+        <div><div class="rc-score">${gsc}%</div><div style="color:#fff;font-size:18px">∨</div></div>
+      </div>
+      <div class="rc-body" id="edu-body">${childCards}</div>
+    </div>
+    <div class="action-card">
+      <div class="action-title">Action points</div>
+      <div class="action-item"><div class="action-dot"></div>Have a Term Plan Coverage of Rs. 1,00,00,000</div>
+      <div class="action-item"><div class="action-dot"></div>Invest in a Child Education Plan</div>
+      <div class="action-item"><div class="action-dot"></div>Have a monthly SIP of at least Rs. ${Math.round(income*0.05).toLocaleString('en-IN')}</div>
+    </div>`;
+  }
+  document.getElementById('goal-results').innerHTML=grHTML;
+
+  // BUDGET RESULT
+  const budgetHealthy=budget>=70;
+  const needsAmt=Math.round(income*0.545);
+  const wantsAmt=Math.round(income*0.115);
+  document.getElementById('budget-result').innerHTML=`
+  <div class="result-card">
+    <div class="rc-header" onclick="toggleRC('bud-body')">
+      <div class="rc-left">
+        <div class="rc-donut" style="background:${budgetHealthy?'rgba(22,163,74,.3)':'rgba(220,38,38,.3)'}">💰</div>
+        <div>
+          <div class="rc-title">Budget Management</div>
+          <div><span class="rc-badge ${budgetHealthy?'rc-healthy':'rc-unhealthy'}">${budgetHealthy?'Healthy':'Unhealthy'}</span></div>
+        </div>
+      </div>
+      <div><div class="rc-score">${budget}%</div><div style="color:#fff;font-size:18px">∨</div></div>
+    </div>
+    <div class="rc-body" id="bud-body">
+      <div class="money-line">
+        <div class="money-icon">💰</div>
+        <div><div class="money-amt">Rs.${(needsAmt+wantsAmt).toLocaleString('en-IN')}/-</div><div class="money-lbl">is your family's total monthly spending</div></div>
+      </div>
+      <div class="grid-2" style="margin-top:10px">
+        <div class="grid-stat"><div class="gs-lbl">Amount spent on Needs</div><div class="gs-val">₹${needsAmt.toLocaleString('en-IN')}/month</div><span class="gs-badge" style="background:var(--green);color:#fff">STATUS: Healthy</span></div>
+        <div class="grid-stat"><div class="gs-lbl">Amount spent on Wants</div><div class="gs-val">₹${wantsAmt.toLocaleString('en-IN')}/month</div><span class="gs-badge" style="background:var(--red);color:#fff">STATUS: Unhealthy</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="action-card">
+    <div class="action-title">Action points</div>
+    <div class="action-item"><div class="action-dot"></div>Limit your spending on Wants to Rs.${wantsAmt.toLocaleString('en-IN')} max.</div>
+    <div class="action-item"><div class="action-dot"></div>Strictly NO CREDIT CARDS</div>
+    <div class="action-item"><div class="action-dot"></div>Control your transportation cost to Rs. ${Math.round(income*0.07).toLocaleString('en-IN')} max</div>
+    <div class="action-item"><div class="action-dot"></div>Prepare and follow a Monthly Budget</div>
+  </div>`;
+
+  // RISK RESULT
+  const riskHealthy=risk>=60;
+  const protPct=risk;
+  document.getElementById('risk-result').innerHTML=`
+  <div class="result-card">
+    <div class="rc-header" onclick="toggleRC('risk-body')">
+      <div class="rc-left">
+        <div class="rc-donut" style="background:${riskHealthy?'rgba(22,163,74,.3)':'rgba(220,38,38,.3)'}">🛡️</div>
+        <div>
+          <div class="rc-title">Risk Management</div>
+          <div><span class="rc-badge ${riskHealthy?'rc-healthy':'rc-unhealthy'}">${riskHealthy?'Healthy':'Unhealthy'}</span></div>
+        </div>
+      </div>
+      <div><div class="rc-score">${risk}%</div><div style="color:#fff;font-size:18px">∨</div></div>
+    </div>
+    <div class="rc-body" id="risk-body">
+      <div style="color:rgba(255,255,255,.85);font-size:13px;margin-bottom:10px">💰 You need to be more prepared for handling financial emergencies that may arise in the future</div>
+      <div style="font-size:13px;color:#fff;font-weight:700;text-align:center;margin-bottom:8px">Financial Protection Status</div>
+      <div class="prot-bar-wrap">
+        <div class="prot-bar-track"><div class="prot-bar-dot" style="left:${protPct}%"></div></div>
+        <div class="prot-bar-labels"><span>Need Help</span><span>Risky</span><span>Normal</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="action-card">
+    <div class="action-title">Action points</div>
+    <div class="action-item"><div class="action-dot"></div>Have Health Insurance Coverage of Rs.10 lacs</div>
+    <div class="action-item"><div class="action-dot"></div>Build an Emergency Fund of Rs. ${Math.round(income*1.95).toLocaleString('en-IN')}</div>
+    <div class="action-item"><div class="action-dot"></div>Have a Term Plan coverage of Rs. 1,00,00,000</div>
+    <div class="action-item"><div class="action-dot"></div>Disability Insurance is a must-have</div>
+  </div>`;
+
+  // WEALTH RESULT
+  const wealthHealthy=wealth>=60;
+  const wealthMin=Math.round(income*0.26);
+  const assetStatus=selectedAssets.length>0&&!selectedAssets.includes('None')?'Healthy':'Unhealthy';
+  const habitStatus=state.wealth.sip==='yes'&&state.wealth.savings==='yes'?'Healthy':'Unhealthy';
+  document.getElementById('wealth-result').innerHTML=`
+  <div class="result-card">
+    <div class="rc-header" onclick="toggleRC('wlth-body')">
+      <div class="rc-left">
+        <div class="rc-donut" style="background:${wealthHealthy?'rgba(22,163,74,.3)':'rgba(220,38,38,.3)'}">📈</div>
+        <div>
+          <div class="rc-title">Wealth Management</div>
+          <div><span class="rc-badge ${wealthHealthy?'rc-healthy':'rc-unhealthy'}">${wealthHealthy?'Healthy':'Unhealthy'}</span></div>
+        </div>
+      </div>
+      <div><div class="rc-score">${wealth}%</div><div style="color:#fff;font-size:18px">∨</div></div>
+    </div>
+    <div class="rc-body" id="wlth-body">
+      <div class="money-line">
+        <div class="money-icon">💰</div>
+        <div><div class="money-amt">Rs. ${wealthMin.toLocaleString('en-IN')}/month</div><div class="money-lbl">Your minimum contribution towards wealth creation</div></div>
+      </div>
+      <div class="grid-2" style="margin-top:10px">
+        <div class="grid-stat"><div class="gs-lbl">Asset Portfolio Mix</div><span class="gs-badge" style="background:${assetStatus==='Healthy'?'var(--green)':'var(--red)'};color:#fff">STATUS: ${assetStatus}</span></div>
+        <div class="grid-stat"><div class="gs-lbl">Habit Score</div><span class="gs-badge" style="background:${habitStatus==='Healthy'?'var(--green)':'var(--red)'};color:#fff">STATUS: ${habitStatus}</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="action-card">
+    <div class="action-title">Action points</div>
+    <div class="action-item"><div class="action-dot"></div>Have a monthly SIP of at least Rs. ${Math.round(income*0.05).toLocaleString('en-IN')}</div>
+    <div class="action-item"><div class="action-dot"></div>Generate rental income by owning Shops/Offices/Apartments</div>
+    <div class="action-item"><div class="action-dot"></div>Save at least Rs. ${Math.round(income*0.15).toLocaleString('en-IN')} per month</div>
+  </div>`;
+}
+
+function toggleRC(id){
+  const el=document.getElementById(id);
+  if(el)el.classList.toggle('open');
+}
+
+// ===== FULL 12-PAGE PDF MATCHING SAMPLE =====
+function generateReport(){
+  const btn=event.currentTarget;
+  btn.textContent='⏳ Opening Report...';
+  btn.disabled=true;
+  const {finergy,budget,risk,wealth}=state.scores;
+  const name=state.client.name;
+  const nameUpper=name.toUpperCase();
+  const age=state.client.age||(new Date().getFullYear()-parseInt(document.getElementById('dob-y').value||1990));
+  const income=state.client.income;
+  const dobDisplay=state.client.dob||'—';
+  const statusWord=finergy>=70?'Healthy':finergy>=41?'Average':'Weak';
+  const kids=state.client.kids||'0';
+  const emi=Math.round(income*0.25);
+  const needs=Math.round(income*0.575);
+  const wants=Math.round(income*0.105);
+  const savings=Math.round(income*0.15);
+  const sip=Math.round(income*0.05);
+  const disabilityPlan=Math.round(income*50);
+  const emergencyFund=Math.round(income*1.95);
+  const termPlan=Math.round(income*100);
+  const healthIns=Math.round(income*15);
+  const nps=Math.round(income*0.06);
+  const inr=(n)=>'₹'+Math.round(n).toLocaleString('en-IN');
+  const inrNoSymbol=(n)=>Math.round(n).toLocaleString('en-IN');
+  const hBadge=(v)=>`<span style="background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">${v}</span>`;
+  const uBadge=(v)=>`<span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">${v}</span>`;
+  const badge=(yes,v)=>yes?hBadge(v):uBadge(v);
+  const goodBadge=`<span style="color:#1A237E;font-weight:900;font-size:15px">▶ Good</span>`;
+  const badBadge=`<span style="color:#DC2626;font-weight:900;font-size:15px">▶ Bad</span>`;
+
+  // Goal calculations
+  let goalsTableRows='';
+  let goalPages='';
+  let goalNum=0;
+
+  if(state.goals.includes('retirement')){
+    goalNum++;
+    const retAge=state.goalDetails.retAge||60;
+    const retExp=state.goalDetails.retExp||50000;
+    const yrs=Math.max(1,retAge-age);
+    const futureExp=Math.round(retExp*Math.pow(1.06,yrs));
+    const realRate=(0.07-0.06)/1.06;
+    const life=25;
+    const corpus=realRate>0?Math.round(futureExp*12*(1-Math.pow(1+realRate,-life))/realRate):Math.round(futureExp*12*life);
+    const byYear=new Date().getFullYear()+yrs;
+    const gScore=state.scores.goals?.retirement||34;
+    goalsTableRows+=`<tr><td style="color:#1A237E;font-weight:700">Goal ${goalNum} Retirement</td><td>${inrNoSymbol(corpus)}</td><td>${byYear} (${yrs} Yrs)</td><td>${gScore}%</td></tr>`;
+
+    goalPages+=`
+    <div class="section-break"></div>
+    <div style="background:#1A237E;padding:16px 24px;color:#fff">
+      <div style="font-size:11px;color:#F5A623;font-weight:700;margin-bottom:4px">GOAL ${goalNum}</div>
+      <div style="font-size:20px;font-weight:900">BUILD FUND FOR RETIREMENT</div>
+      <div style="font-size:13px;opacity:.85;margin-top:4px">Uh oh! You're just ${gScore}% likely to complete your goal</div>
+    </div>
+    <div class="body-pad">
+      <div style="text-align:center;margin:20px 0 8px">
+        <div style="font-size:28px;font-weight:900;color:#1A237E">${inr(corpus)}</div>
+        <div style="font-size:13px;font-weight:700;color:#1A237E;margin-top:4px">Total funds you need at the age of ${retAge}</div>
+        <div style="font-size:12px;color:#555;margin-top:6px;line-height:1.5">This is the amount of money you will need at the age of ${retAge} in order to<br>maintain your current lifestyle. The figure is calculated using your<br>current spendings and the average inflation rate in India.</div>
+      </div>
+      <div style="display:flex;gap:24px;margin:16px 0;padding:16px 0;border-top:1px dashed #ddd;border-bottom:1px dashed #ddd">
+        <div><div style="font-size:20px;font-weight:900;color:#1A237E">${inr(retExp)}/Month</div><div style="font-size:12px;color:#555">Current expenses</div></div>
+        <div><div style="font-size:20px;font-weight:900;color:#1A237E">${inr(futureExp)}/ Month</div><div style="font-size:12px;color:#555">Expenses at the age of ${retAge}</div></div>
+      </div>
+      <div class="analysis-box"><div class="analysis-title">Analysis</div>
+        <p>Your score is ${gScore} and you are ${age} years old, which is ${gScore<50?'below':'at'} the average score, however, your ${age<40?'lower':''} age may still be an advantage. You have to dedicate the next decade to saving and building your retirement fund.</p>
+      </div>
+      <div class="solutions-box"><div class="solutions-title">Solutions</div>
+        <div class="sol-subtitle">Here's how you can get a 100% on your Goal Score</div>
+        <div class="sol-item"><div class="sol-num">1</div><div><strong>Lifetime annuity</strong><br>Most retirement income plans are unpredictable. You don't know how long you will live and if the money will last. A lifetime annuity with inflation protection is one must investment you need to do to have a secured retired life. Annuity plans are sold by Insurance companies in India and provide guaranteed monthly/annual income as long as the insured lives. Ask your financial advisor about annuity plans.</div></div>
+        <div class="sol-item"><div class="sol-num">2</div><div><strong>Reach 65 debt-free</strong><br>One most important suggestion, the target should be to reach 65 debt-free. That includes credit card debt, and car and mortgage loans. The reason is simple: you don't want to be going into your non-earning years owing money. Most Indian parents take loans in their late 50s for their children's marriage or education. Ensure that this is completely avoided.</div></div>
+      </div>
+      <div class="factor-header">Uh oh! You're just ${gScore}% likely to complete your goal<br><span style="font-size:12px">Here's what you're doing right/wrong</span></div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Get a health insurance</div></div><div><div class="factor-label">How well you're doing</div>${state.risk.health_ins==='yes'?goodBadge:badBadge}</div></div>
+      ${state.risk.health_ins==='yes'
+        ?'<div class="factor-bullets"><div class="bullet">▶ A majority of senior citizens use up to 30% of their retirement fund for meeting hospitalisation expenses post-retirement.</div><div class="bullet">▶ Since you have a health insurance plan you will be able to protect your retirement fund and enjoy a better life.</div></div>'
+        :'<div class="factor-bullets"><div class="bullet">▶ A majority of senior citizens use up to 30% of their retirement fund for meeting hospitalisation expenses post-retirement.</div><div class="bullet">▶ Since you don\'t have a health insurance plan your retirement fund may deplete in value in case of a medical emergency.</div></div>'}
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Invest in Retirement Plans</div></div><div><div class="factor-label">How well you're doing</div>${state.risk.annuity==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets">
+        <div class="bullet">▶ By 2030, the life expectancy in India will be 80 years. This means you will need quite some money to enjoy your life after retirement.</div>
+        <div class="bullet">▶ As per our analysis, you will need ${inr(futureExp)}/ month to maintain your today's lifestyle post-retirement.</div>
+        <div class="bullet">▶ ${state.risk.annuity==='yes'?'You have an Annuity plan. Ensure it aligns to your retirement corpus goal.':'You don\'t have an Annuity plan, nor do you save in PPF/NPS. Looks like you will be approaching your retirement age completely unplanned.'}</div>
+        <div class="bullet">▶ You are ${age} years now, in the next decade you can get things in order. Get consultation for retirement planning now.</div>
+      </div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Have a Monthly SIP</div></div><div><div class="factor-label">How well you're doing</div>${state.wealth.sip==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets">
+        <div class="bullet">▶ ${state.wealth.sip==='yes'?'It\'s great that you are investing more than 5% of your income in monthly SIP.':'You are not investing in Monthly SIPs. Start an SIP of at least '+inr(sip)+'/month immediately.'}</div>
+        <div class="bullet">▶ We will need to do a detailed portfolio analysis of your Mutual Fund SIP to find out the portfolio mix, and the returns expected and align your SIPs to your retirement goal.</div>
+      </div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Save at least 15% of your income</div></div><div><div class="factor-label">How well you're doing</div>${state.wealth.savings==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets">
+        <div class="bullet">▶ 2.5% of this 15% should be aligned to retirement planning.</div>
+        <div class="bullet">▶ Invest these savings in financial instruments like PPF/NPS/Mutual Fund.</div>
+      </div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Build more assets</div></div><div><div class="factor-label">How well you're doing</div>${selectedAssets.length>0&&!selectedAssets.includes('None')?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets">
+        <div class="bullet">▶ ${selectedAssets.length>0&&!selectedAssets.includes('None')?'You have investments in properties. This could be a great help and work like a secondary income source for you during your retirement.':'You don\'t have any investments in properties. Secondary income sources especially property rentals can help you live a comfortable retired life.'}</div>
+        <div class="bullet">▶ You have another decade with you, you can plan to create a commercial asset which can help you earn rental income.</div>
+      </div>
+    </div>`;
+  }
+
+  if(state.goals.includes('education')&&state.goalDetails.children&&state.goalDetails.children.length>0){
+    goalNum++;
+    const gScore=state.scores.goals?.education||36;
+    const fees={MBA:{n:2310938,p:6897579},MBBS:{n:3500000,p:9000000},Engineering:{n:1200000,p:4500000},CA:{n:800000,p:1800000},'Other PG':{n:1500000,p:4000000}};
+    const childRows=state.goalDetails.children.map((c,i)=>{
+      const yrs=Math.max(1,18-c.age);
+      const f=fees[c.degree]||fees.MBA;
+      const normal=Math.round(f.n*Math.pow(1.10,yrs));
+      const premier=Math.round(f.p*Math.pow(1.10,yrs));
+      const childLabel=c.name?c.name:`Child ${i+1}`;
+      return `<tr>
+        <td style="color:#1A237E;font-weight:700">${childLabel}</td>
+        <td>${c.age} yrs</td>
+        <td>${c.degree}</td>
+        <td>${yrs} yrs</td>
+        <td>${inr(normal)}</td>
+        <td>${inr(premier)}</td>
+      </tr>`;
+    }).join('');
+    const firstChild=state.goalDetails.children[0];
+    const firstYrs=Math.max(1,18-firstChild.age);
+    const firstFees=fees[firstChild.degree]||fees.MBA;
+    const totalNormal=state.goalDetails.children.reduce((s,c)=>{const yrs=Math.max(1,18-c.age);const f=fees[c.degree]||fees.MBA;return s+Math.round(f.n*Math.pow(1.10,yrs));},0);
+    const firstChildLabel=firstChild.name?firstChild.name:'your child';
+    goalsTableRows+=`<tr><td style="color:#1A237E;font-weight:700">Goal ${goalNum} Child Education</td><td>${inrNoSymbol(totalNormal)}</td><td>By age 18</td><td>${gScore}%</td></tr>`;
+    goalPages+=`
+    <div class="section-break"></div>
+    <div style="background:#1A237E;padding:16px 24px;color:#fff">
+      <div style="font-size:11px;color:#F5A623;font-weight:700;margin-bottom:4px">GOAL ${goalNum}</div>
+      <div style="font-size:20px;font-weight:900">SAVE FOR CHILD'S EDUCATION</div>
+      <div style="font-size:13px;opacity:.85;margin-top:4px">Uh oh! You're just ${gScore}% likely to complete your goal</div>
+    </div>
+    <div class="body-pad">
+      <div style="text-align:center;margin:20px 0 8px">
+        <div style="font-size:28px;font-weight:900;color:#1A237E">${inr(totalNormal)}</div>
+        <div style="font-size:13px;font-weight:700;color:#1A237E;margin-top:4px">Total funds needed across all children's education</div>
+        <div style="font-size:12px;color:#555;margin-top:6px;line-height:1.5">Calculated based on current fee structures with 10% annual education inflation.</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:12px">
+        <thead><tr style="background:#1A237E;color:#fff">
+          <th style="padding:8px 10px;text-align:left">Child</th>
+          <th style="padding:8px 10px;text-align:left">Age</th>
+          <th style="padding:8px 10px;text-align:left">Degree</th>
+          <th style="padding:8px 10px;text-align:left">Yrs Left</th>
+          <th style="padding:8px 10px;text-align:left">Normal Fees</th>
+          <th style="padding:8px 10px;text-align:left">Premier Fees</th>
+        </tr></thead>
+        <tbody>${childRows}</tbody>
+      </table>
+      <div class="analysis-box"><div class="analysis-title">Analysis</div><p>Education costs are rising at approximately 10% per year in India, which means the amount needed to fund your child's education is significantly higher than what it costs today. Your achievement score is ${gScore}%, making it ${gScore<50?'difficult but possible':'quite possible'} to achieve this goal with proper planning. Start investing early to benefit from the power of compounding.</p></div>
+      <div class="solutions-box"><div class="solutions-title">Solutions</div>
+        <div class="sol-subtitle">Here's how you can get a 100% on your Goal Score</div>
+        <div class="sol-item"><div class="sol-num">1</div><div><strong>Child Education Plan / ULIP</strong><br>A child education plan (ULIP or endowment) ensures that even if something happens to you, the premium waiver benefit ensures the fund continues to grow. This gives double protection — investment + life cover — and the corpus is available when your child needs it most.</div></div>
+        <div class="sol-item"><div class="sol-num">2</div><div><strong>Start a dedicated SIP</strong><br>Start a separate SIP specifically earmarked for ${firstChildLabel}'s education. Equity mutual funds have historically delivered 12–15% CAGR, which outpaces education inflation of 10%. Even a small SIP started today can grow significantly by the time your child is ready for college.</div></div>
+        <div class="sol-item"><div class="sol-num">3</div><div><strong>Sukanya Samriddhi Yojana (for daughters)</strong><br>If applicable, SSY offers one of the highest guaranteed returns (8.2% p.a.) with tax-free maturity. It's a government-backed scheme specifically designed to fund a girl child's education and marriage.</div></div>
+      </div>
+      <div class="factor-header">Uh oh! You're just ${gScore}% likely to complete your goal<br><span style="font-size:12px">Here's what you're doing right/wrong</span></div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Have a Term Plan</div></div><div><div class="factor-label">How well you're doing</div>${state.risk.term_plan==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets"><div class="bullet">▶ ${state.risk.term_plan==='yes'?'You have a term plan — great! This ensures your children\'s education fund is protected even in your absence.':'You don\'t have a term plan. This is critical — if something happens to you, your children\'s education goals will be severely affected. Get a term plan of at least '+inr(termPlan)+' immediately.'}</div></div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Have a Monthly SIP</div></div><div><div class="factor-label">How well you're doing</div>${state.wealth.sip==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets"><div class="bullet">▶ ${state.wealth.sip==='yes'?'You are investing in monthly SIPs. Ensure that a portion of your SIP is dedicated specifically towards your child\'s education goal.':'You are not investing in monthly SIPs. Start an SIP of at least '+inr(sip)+'/month and allocate a portion specifically towards education planning.'}</div></div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Save at least 15% of your income</div></div><div><div class="factor-label">How well you're doing</div>${state.wealth.savings==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets"><div class="bullet">▶ ${state.wealth.savings==='yes'?'Good savings habit! Ensure that at least 2-3% of your income is routed into a child education fund.':'You need to build savings discipline first. Target saving 15% of income ('+inr(Math.round(income*0.15))+') per month before dedicating funds to education planning.'}</div></div>
+    </div>`;
+  }
+
+  if(state.goals.includes('travel')){
+    goalNum++;
+    const tripCost=state.goalDetails?.tripCost||200000;
+    const tripYears=state.goalDetails?.tripYears||4;
+    const futureCost=Math.round(tripCost*Math.pow(1.06,tripYears));
+    const byYear=new Date().getFullYear()+tripYears;
+    const gScore=state.scores.goals?.travel||44;
+    goalsTableRows+=`<tr><td style="color:#1A237E;font-weight:700">Goal ${goalNum} Trip Abroad</td><td>${inrNoSymbol(futureCost)}</td><td>${byYear} (${tripYears} Yrs)</td><td>${gScore}%</td></tr>`;
+    goalPages+=`
+    <div class="section-break"></div>
+    <div style="background:#1A237E;padding:16px 24px;color:#fff">
+      <div style="font-size:11px;color:#F5A623;font-weight:700;margin-bottom:4px">GOAL ${goalNum}</div>
+      <div style="font-size:20px;font-weight:900">TRIP ABROAD WITH FAMILY</div>
+      <div style="font-size:13px;opacity:.85;margin-top:4px">Oops! You're just ${gScore}% likely to complete your goal</div>
+    </div>
+    <div class="body-pad">
+      <div style="text-align:center;margin:20px 0 8px">
+        <div style="font-size:28px;font-weight:900;color:#1A237E">${inr(futureCost)}</div>
+        <div style="font-size:13px;font-weight:700;color:#1A237E;margin-top:4px">Total funds you need for your family trip</div>
+        <div style="font-size:12px;color:#555;margin-top:6px;line-height:1.5">This is the amount of money you will need to go on your dream vacation.<br>The figure is calculated using the current cost of the trip and the average holiday inflation rate.</div>
+      </div>
+      <div class="analysis-box"><div class="analysis-title">Analysis</div><p>Even if you're just in the daydreaming phase, it's never too early to get your dream holiday plan ready. The finergy process has educated you on the inflated future cost of your dream holiday. That's a good start. Your achievement score is ${gScore}%, making it ${gScore<50?'difficult':'possible'} for you to achieve this goal on time. If you are serious about this goal, talk to our expert and get a concrete plan in place.</p></div>
+      <div class="solutions-box"><div class="solutions-title">Solutions</div>
+        <div class="sol-subtitle">Here's how you can get a 100% on your Goal Score</div>
+        <div class="sol-item"><div class="sol-num">1</div><div><strong>Budget the trip</strong><br>Budget the trip and segregate the expenses as needs and wants. Your needs are travel tickets, accommodation, food and local transportation. Your wants are shopping, private taxis, peak-season trips, expensive dining etc. Always cut down on your wants to get your trip budget within reach.</div></div>
+        <div class="sol-item"><div class="sol-num">2</div><div><strong>Save regularly</strong><br>Save regularly for this goal. Preferably in low-risk financial instruments as the tenure of investment is short.</div></div>
+        <div class="sol-item"><div class="sol-num">3</div><div><strong>Travel Insurance</strong><br>Don't forget to take that travel insurance while travelling abroad. A medical emergency abroad can be many times more expensive and an absence of insurance backing may also deprive you of immediate treatment.</div></div>
+      </div>
+      <div class="factor-header">Oops! You're just ${gScore}% likely to complete your goal<br><span style="font-size:12px">Here's what you're doing right/wrong</span></div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Have a Monthly SIP</div></div><div><div class="factor-label">How well you're doing</div>${state.wealth.sip==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets"><div class="bullet">▶ Let's allocate your SIPs towards achieving this goal. To ascertain the exact proportion of allocation, we can arrange for a discussion with our expert.</div></div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Save at least 15% of your income</div></div><div><div class="factor-label">How well you're doing</div>${state.wealth.savings==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets"><div class="bullet">▶ ${state.wealth.savings==='yes'?'It\'s great that you can save 15% of your monthly income. Next, we need to allocate some of these savings towards your Dream Holiday Goal.':'You need to save at least 15% of your monthly income first before planning a trip abroad.'}</div></div>
+      <div class="factor-row"><div><div class="factor-label">Factors that affect your Goal</div><div class="factor-name">Build an emergency fund</div></div><div><div class="factor-label">How well you're doing</div>${state.risk.emergency_fund==='yes'?goodBadge:badBadge}</div></div>
+      <div class="factor-bullets"><div class="bullet">▶ ${state.risk.emergency_fund==='yes'?'You have an emergency fund in place. Basic financial fitness is achieved. Now you can plan for luxury goals like a trip abroad.':'You don\'t have an emergency fund in place, hence it\'s quite unorganised to plan for a trip abroad. Basic financial fitness has to be achieved first.'}</div></div>
+    </div>`;
+  }
+
+  // Budget questions detail
+  const budgetDetails=BUDGET_QS.map(q=>{
+    const ans=state.budget[q.id];
+    const withinBudget=ans==='yes';
+    const budgetAmt=Math.round(income*q.budget_pct/100);
+    let commentary='';
+    if(q.id==='household') commentary=withinBudget?`Household expense is an IMPORTANT NEED, you can allocate ${q.budget_pct}% of your income towards these needs. It's a big achievement that you can stay within the given budget. This achievement will certainly help you make better financial decisions, prepare for emergencies, get out of debt, and stay focused on your long-term financial goals.`:`You are over budget on household expenses. This is a critical area to control. Review your grocery bills, domestic help costs and other household spends immediately.`;
+    else if(q.id==='transport') commentary=withinBudget?`The current trend of rising fuel costs has forced households to spend more on transportation. Even then, you are able to stay within the budget and this is fantastic. Your transportation cost is within 10% of your income.`:`You are over budget on transportation, these days this is quite common due to the rising fuel costs. If you are using public transport and are still over budget, there is hardly anything much you can do to reduce the cost. But if the reason is due to the use of your own vehicle, it's time that you rethink and re-organise this spending. With a few lifestyle changes and discipline, you can get this cost reduced by at least 30% from its current levels.`;
+    else if(q.id==='rent') commentary=withinBudget?`The biggest part of most people's budgets is housing. The general rule of thumb is to spend max about 20% on rent. You are within budget for your rentals, but our strong suggestion would be to own a house in near future. Our experts can help you plan for this Goal.`:`You are over budget on rent/housing. The general rule of thumb is to spend max about 20% on rent. If you have taken a housing loan stick to a max EMI of 35% of your gross monthly income.`;
+    else if(q.id==='emi') commentary=withinBudget?`Financial planning actually begins with managing your loans or your debt. EMI is an expense which does not offer you flexibility. We suggest that your EMI should be max of 25% of your monthly income, and you are well within the budget. In the next step get your debt analysed by our experts.`:`Your EMI is above 25% of your monthly income which is a danger zone. Financial planning actually begins with managing your loans. Get your debt analysed by our experts, and find out which loans can be rescheduled at a lower interest rate.`;
+    else if(q.id==='personal_care') commentary=withinBudget?`These expenses are often recurring and fall in between your needs and wants. If managed within the budget of max 3.5% of your monthly income it may not worry you. You are within budget — great discipline!`:`These expenses are often recurring and fall in between your needs and wants. Overspending on these expenses will hamper your financial plan. You are over budget in these expenses. Get this rectified immediately.`;
+    else if(q.id==='entertainment') commentary=withinBudget?`Today 50% of urban households overspend on their entertainment. You are currently within your budget of ${inr(budgetAmt)} and that is fantastic.`:`Today 50% of urban households overspend on their entertainment, this is a waste of hard-earned money. A simple way is to stay within your allocated budget of ${inr(budgetAmt)}. You are currently over the budget — try to stay within the given budget.`;
+    else if(q.id==='eating_out') commentary=withinBudget?`You are within your budget of ${inr(budgetAmt)}. If money is saved here you will be able to invest in regular savings like mutual funds and build wealth for funding your goals.`:`You are spending more than your budget of ${inr(budgetAmt)}. A small rise of 10-15% is still ok, but if you are overspending by 30% or more this is unhealthy. Remember that the daily good habits you build will decide your financial future.`;
+    return `<div class="factor-row"><div><div class="factor-label">Question</div><div class="factor-name">${q.label}</div></div><div><div class="factor-label">Your response</div>${withinBudget?'<span style="color:#1A237E;font-weight:900;font-size:14px">▶ Within Budget</span>':'<span style="color:#DC2626;font-weight:900;font-size:14px">▶ Over Budget</span>'}</div></div><div class="factor-bullets"><div class="bullet">▶ ${commentary}</div></div>`;
+  }).join('');
+
+  // Risk questions detail
+  const riskDetails=[
+    {id:'health_ins',label:'Get a health insurance',yes:`The Covid-19 pandemic has made the entire world sit up and realise that medical exigencies are unpredictable. You do have a health insurance plan — that's fantastic. As per your income slab, you need a minimum cover of ${inr(healthIns)}, we assume you are adequately covered.`,no:`The Covid-19 pandemic has made the entire world sit up and realise that medical exigencies are unpredictable and can cause a financial upheaval that is tough to handle. You don't have a health insurance plan and that's going to affect your savings and wealth in case of a medical emergency. As per your income slab, you need a minimum cover of ${inr(healthIns)}, kindly contact your advisor and take quotations.`},
+    {id:'term_plan',label:'Have a Term Plan',yes:`You have a term plan in place. Ensure it covers at least 100 times your monthly income (${inr(termPlan)}) to give financial security for at least the next 10 years for your family.`,no:`You never want your family to be helpless for finance. If you have a family who is going to miss your income, ensure you have a Term plan of at least 100 times your monthly income (${inr(termPlan)}). You DON'T have ADEQUATE TERM INSURANCE and this is a critical financial weakness. Contact our expert IMMEDIATELY.`},
+    {id:'disability',label:'Have a Personal Accident Plan (Disability Insurance)',yes:`You have a disability insurance plan — that's fantastic. If you've had an accident that has led to disability, insurance with critical illness and disability coverage can replace a portion of your income. Will suggest getting the same evaluated through our experts for better understanding.`,no:`If you've had an accident that has led to disability or you've been diagnosed with a critical illness, chances are you'll be unable to work for quite some time. You DON'T have a disability insurance plan for you and that's not good. We strongly suggest you consult our expert to know more about this plan.`},
+    {id:'emergency_fund',label:'Build an Emergency Fund',yes:`Most of us have fixed monthly commitments like EMIs, Household Expenses, Fuel costs, Rentals etc. You should have at least 3 to 6 months of backup as an emergency fund (${inr(emergencyFund)}). You are prepared for this challenge — that's very smart. Be prepared always.`,no:`Most of us have fixed monthly commitments like EMIs, household expenses, fuel costs, rentals etc. Covid-19 taught us that sudden loss of income can be more common than ever. You should have at least 3 to 6 months of backup as an emergency fund (${inr(emergencyFund)}). You are NOT prepared for this challenge and that's a financial weakness. We strongly suggest you start building an emergency fund.`},
+    {id:'annuity',label:'Have an Annuity Insurance Plan for retirement',yes:`You have an Annuity Insurance Plan in place. Annuity plans provide you with fixed pension per month upto 99 yrs Age post your retirement — that's excellent planning.`,no:`Annuity Insurance plans provide you with fixed pension per month upto 99 yrs Age post your retirement. You don't have an Annuity plan. 57% of people have to depend on their children for money during their retirement phase. Get an Annuity plan immediately.`}
+  ].map(q=>`<div class="factor-row"><div><div class="factor-label">Question</div><div class="factor-name">${q.label}</div></div><div><div class="factor-label">How well you're doing</div>${state.risk[q.id]==='yes'?goodBadge:badBadge}</div></div><div class="factor-bullets"><div class="bullet">▶ ${state.risk[q.id]==='yes'?q.yes:q.no}</div></div>`).join('');
+
+  // Wealth questions detail
+  const wealthDetails=[
+    {id:'sip',label:'Have a Monthly SIP',yes:`In Today's Modern world, It's a must to save at least 5% in SIP (${inr(sip)}/month). You have been doing this and it can benefit you in long run. Compared to traditional fixed deposits or recurring deposits, SIP provides double the returns. If you stay invested for the long term, the compounding effect makes your returns much higher.`,no:`In Today's Modern world, It's a must to save at least 5% in SIP (${inr(sip)}/month). You are NOT investing in Monthly SIPs and this is a missed opportunity. SIP provides double the returns compared to traditional FDs, can save tax if invested in ELSS, and has high liquidity. Start your SIP immediately.`},
+    {id:'savings',label:'Save at least 15% of your income',yes:`Congratulations on saving more than 15% per month (${inr(savings)}). Investing a set amount every month inculcates the habit of saving. If you can achieve to save more than 15% each month, it's a triple advantage — you set aside investment, save for emergencies, and look for ways to cut down on expenses. Ensure that at least 70% of this saved amount is invested in financial instruments.`,no:`You should be saving at least 15% of your income (${inr(savings)}) per month. You are NOT saving enough and this will hamper your long-term wealth creation. Start by reducing discretionary expenses and automate your savings on salary day.`},
+    {id:'rental',label:'Have an existing source of rental income',yes:`You have an existing source of rental income — that's excellent! Commercial real estate is one of the best ways to earn regular passive income. The rental received takes care of inflation and also allows you to earn additional gains, the long-term property appreciation is the double benefit.`,no:`You don't have a rental income source. Commercial real estate is one of the best ways to earn regular passive income. 70% of the clients we serve don't have this investment. If planned properly you can own a commercial property in the next 5 years and benefit from it for the next 20 years.`}
+  ].map(q=>`<div class="factor-row"><div><div class="factor-label">Question</div><div class="factor-name">${q.label}</div></div><div><div class="factor-label">How well you're doing</div>${state.wealth[q.id]==='yes'?goodBadge:badBadge}</div></div><div class="factor-bullets"><div class="bullet">▶ ${state.wealth[q.id]==='yes'?q.yes:q.no}</div></div>`).join('');
+
+  const assetStatus=selectedAssets.length>0&&!selectedAssets.includes('None');
+  const wealthAssetsDetail=`<div class="factor-row"><div><div class="factor-label">Question</div><div class="factor-name">Build more assets</div></div><div><div class="factor-label">How well you're doing</div>${assetStatus?goodBadge:badBadge}</div></div><div class="factor-bullets"><div class="bullet">▶ ${assetStatus?'You have investments in properties ('+selectedAssets.filter(a=>a!=='None').join(', ')+') — this is excellent! Commercial real estate is one of the best ways to earn regular passive income. The rental received takes care of inflation and the long-term property appreciation is the double benefit.':'You don\'t have any investments in properties. Secondary income sources especially property rentals can help you live a comfortable life. 70% of the clients we serve don\'t have this investment. If planned properly you can own a commercial property in the next 5 years and benefit from it for the next 20 years.'}</div></div>`;
+
+  const css=`
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{font-family:Arial,sans-serif;color:#1e1e2e;font-size:13px;line-height:1.5}
+    .section-break{page-break-before:always}
+    .cover{background:#1A237E;padding:40px 36px;text-align:center;color:#fff}
+    .cover h1{font-size:26px;font-weight:900;color:#F5A623;margin-bottom:10px}
+    .client-band{background:#f0f4ff;border-left:6px solid #F5A623;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+    .score-band{background:#1A237E;color:#fff;padding:18px 24px;display:flex;gap:20px;align-items:flex-start}
+    .big-score{font-size:48px;font-weight:900;color:#F5A623;line-height:1}
+    .body-pad{padding:16px 24px}
+    .summary-table{width:100%;border-collapse:collapse}
+    .summary-table th{background:#1A237E;color:#fff;padding:8px 12px;font-size:12px;text-align:left}
+    .summary-table td{padding:7px 12px;font-size:12px;border-bottom:1px solid #e5e7eb}
+    .summary-table tr:nth-child(even) td{background:#fafbff}
+    .goals-table{width:100%;border-collapse:collapse;margin-top:12px}
+    .goals-table th{background:#1A237E;color:#fff;padding:8px 12px;font-size:12px;text-align:left}
+    .goals-table td{padding:7px 12px;font-size:12px;border-bottom:1px solid #e5e7eb}
+    .sec-hdr{background:#1A237E;color:#F5A623;padding:10px 24px;font-size:13px;font-weight:700}
+    .score-section-hdr{display:flex;align-items:center;gap:16px;padding:14px 24px;color:#fff}
+    .score-section-hdr.budget{background:#1A237E}
+    .score-section-hdr.risk{background:#7C2D12}
+    .score-section-hdr.wealth{background:#14532D}
+    .section-score{font-size:28px;font-weight:900;color:#F5A623;margin-left:auto}
+    .analysis-box{background:#fff8e1;border:1px solid #F5A623;border-radius:6px;padding:14px;margin:14px 0}
+    .analysis-title{font-size:13px;font-weight:700;text-align:center;margin-bottom:8px;color:#1A237E}
+    .solutions-box{border:1px solid #e5e7eb;border-radius:6px;padding:14px;margin:14px 0}
+    .solutions-title{font-size:13px;font-weight:700;text-align:center;margin-bottom:6px;color:#1A237E}
+    .sol-subtitle{font-size:12px;font-weight:700;text-align:center;margin-bottom:10px}
+    .sol-item{display:flex;gap:10px;margin-bottom:10px;font-size:12px;line-height:1.5}
+    .sol-num{min-width:24px;height:24px;background:#F5A623;color:#1A237E;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0}
+    .factor-header{background:#F5A623;color:#1A237E;padding:10px 14px;font-size:12px;font-weight:700;text-align:center;margin:16px 0 0;border-radius:6px 6px 0 0}
+    .factor-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px dashed #ddd}
+    .factor-label{font-size:11px;color:#666}
+    .factor-name{font-size:16px;font-weight:700;color:#1A237E;margin-top:2px}
+    .factor-bullets{padding:8px 0 12px;border-bottom:1px solid #f0f0f0}
+    .bullet{font-size:12px;line-height:1.6;color:#374151;margin-bottom:4px;padding-left:4px}
+    .stat-row{display:flex;gap:24px;margin:12px 0;padding:12px 0;border-top:1px dashed #ddd;border-bottom:1px dashed #ddd}
+    .stat-item .lbl{font-size:11px;color:#666}
+    .stat-item .val{font-size:18px;font-weight:900;color:#1A237E}
+    .stat-item .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin-top:3px}
+    @media print{.section-break{page-break-before:always}@page{margin:15mm}}
+  `;
+
+  const reportHTML=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Financial Energy Report — ${name}</title><style>${css}</style></head><body>
+
+  <!-- PAGE 1: COVER + SUMMARY -->
+  <div class="cover">
+    <h1>Financial Energy Report</h1>
+    <div style="font-size:13px;opacity:.85">Advisor : <strong>Rajesh R.N</strong></div>
+    <div style="margin-top:12px;font-size:12px;opacity:.7">${dobDisplay}</div>
+  </div>
+  <div class="client-band">
+    <div><div style="font-size:12px;color:#666">${dobDisplay}</div><div style="font-size:22px;font-weight:900;color:#1A237E">${name}</div></div>
+    <div style="text-align:right"><div style="font-size:12px;color:#666">Age &nbsp;<strong>${age}</strong></div><div style="font-size:12px;color:#666;margin-top:4px">Family Details &nbsp;<strong>${kids} Kid${kids!='1'?'s':''}</strong></div></div>
+  </div>
+  <div class="score-band">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:28px">🏁</span>
+      <div><div style="font-size:13px;opacity:.8">Your Finergy level is</div><div class="big-score">${finergy}%</div></div>
+    </div>
+    <div style="flex:1;padding-left:16px">
+      <div style="font-size:15px;font-weight:700">This is a ${statusWord} score considering your age.</div>
+      <div style="font-size:12px;opacity:.85;margin-top:6px;line-height:1.6">Finergy is your financial Fitness score based on how you spend and save your money. A score of ${finergy}% indicates that you are ${finergy>=70?'likely to achieve your dreams.':finergy>=41?'quite likely to achieve your dreams with some effort.':'less likely to achieve your dreams without taking corrective action.'}</div>
+    </div>
+  </div>
+  <div class="body-pad">
+    <div style="font-size:13px;font-weight:700;color:#1A237E;margin-bottom:6px">SUMMARISED VIEW</div>
+    <div style="font-size:12px;font-weight:700;color:#1A237E;margin-bottom:8px">FINERGY DATA</div>
+    <table class="summary-table">
+      <tr><th></th><th>Target/Budget</th><th>Current Position</th></tr>
+      <tr><td><strong>Income Per Month</strong></td><td></td><td><strong>${inrNoSymbol(income)}</strong></td></tr>
+      <tr><td><strong>Finergy Score</strong></td><td>70%</td><td>${finergy}%</td></tr>
+      <tr><td><strong>EMI</strong></td><td>${inrNoSymbol(emi)}</td><td>${hBadge('Healthy')}</td></tr>
+      <tr><td><strong>Needs</strong></td><td>${inrNoSymbol(needs)}</td><td>${hBadge('Healthy')}</td></tr>
+      <tr><td><strong>Wants</strong></td><td>${inrNoSymbol(wants)}</td><td>${uBadge('Unhealthy')}</td></tr>
+      <tr><td><strong>Savings</strong></td><td>${inrNoSymbol(savings)}</td><td>${badge(state.wealth.savings==='yes','Healthy')}</td></tr>
+      <tr><td><strong>SIP</strong></td><td>${inrNoSymbol(sip)}</td><td>${badge(state.wealth.sip==='yes','Healthy')}</td></tr>
+      <tr><td><strong>Disability Plan</strong></td><td>${inrNoSymbol(disabilityPlan)}</td><td>${badge(state.risk.disability==='yes','Healthy')}</td></tr>
+      <tr><td><strong>Emergency Fund</strong></td><td>${inrNoSymbol(emergencyFund)}</td><td>${badge(state.risk.emergency_fund==='yes','Healthy')}</td></tr>
+      <tr><td><strong>Term Plan</strong></td><td>${inrNoSymbol(termPlan)}</td><td>${badge(state.risk.term_plan==='yes','Healthy')}</td></tr>
+      <tr><td><strong>Health Insurance</strong></td><td>${inrNoSymbol(healthIns)}</td><td>${badge(state.risk.health_ins==='yes','Healthy')}</td></tr>
+      <tr><td><strong>Real Estate</strong></td><td>${selectedAssets.filter(a=>a!=='None').join(', ')||'—'}</td><td>${badge(assetStatus,'Healthy')}</td></tr>
+      <tr><td><strong>Child Insurance Plan</strong></td><td>No</td><td>${uBadge('Unhealthy')}</td></tr>
+      <tr><td><strong>Retirement Plan</strong></td><td>No</td><td>${badge(state.risk.annuity==='yes','Healthy')}</td></tr>
+      <tr><td><strong>NPS/PPF</strong></td><td>${inrNoSymbol(nps)}</td><td>${badge(state.risk.annuity==='yes','Healthy')}</td></tr>
+    </table>
+    <div style="margin-top:16px;font-size:12px;font-weight:700;color:#1A237E;margin-bottom:8px">YOUR FINANCIAL GOALS</div>
+    <table class="goals-table">
+      <tr><th></th><th>Funds Needed</th><th>By Year</th><th>Score</th></tr>
+      ${goalsTableRows}
+    </table>
+  </div>
+
+  <!-- DETAILED GOAL PAGES -->
+  ${goalPages}
+
+  <!-- BUDGET MANAGEMENT -->
+  <div class="section-break"></div>
+  <div class="score-section-hdr budget">
+    <span style="font-size:24px">🏁</span>
+    <div><div style="font-size:11px;letter-spacing:1px;opacity:.8">BUDGET MANAGEMENT REPORT</div><div style="font-size:16px;font-weight:900">Your Budget Management Score is ${budget}%!</div></div>
+    <div class="section-score">${budget}%</div>
+  </div>
+  <div class="body-pad">
+    <div style="text-align:center;margin:12px 0">
+      <div style="font-size:13px;font-weight:700">Your family's total monthly spending</div>
+      <div style="font-size:28px;font-weight:900;color:#1A237E">${inr(needs+wants)}/-</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-item"><div class="lbl">Amount spent on Needs</div><div class="val">${inr(needs)}/ Month</div><span class="badge" style="background:#DCFCE7;color:#166534">STATUS: Healthy</span></div>
+      <div class="stat-item"><div class="lbl">Amount spent on Wants</div><div class="val">${inr(wants)}/ Month</div><span class="badge" style="background:#FEE2E2;color:#991B1B">STATUS: Unhealthy</span></div>
+    </div>
+    <div class="analysis-box"><div class="analysis-title">Analysis</div><p>Budgeting is the backbone of strong a financial plan, if your score is positive here, you will definitely lead a financially stable life. In this section, we have provided you with a personalised budget plan which if followed can help you be financially strong. Staying within budget can help you save money which can be invested wisely to build wealth and achieve your financial goals.</p></div>
+    <div class="solutions-box"><div class="solutions-title">Solutions</div>
+      <div class="sol-subtitle">Here's how you can get a 100% on your Budget Management Score</div>
+      <div class="sol-item"><div class="sol-num">1</div><div><strong>Strictly follow the set Budget</strong><br>In this section you have been provided with a personalised budget that's effective for you. Follow this budget strictly for just 3 months and we are sure that you will see your wealth growing. In long term i.e. 3 years or more, your financial goals will be within your reach.</div></div>
+      <div class="sol-item"><div class="sol-num">2</div><div><strong>Make workable budget cuts</strong><br>To make workable budget cuts focus on your fixed expenses first. If you can downgrade recurring monthly subscriptions (Netflix, WiFi, magazines, club memberships etc), it will have a big long-term impact on your savings goals.</div></div>
+      <div class="sol-item"><div class="sol-num">3</div><div><strong>Separate needs from wants</strong><br>Separating your need from your want is very crucial for personal financial planning. Wants can be unlimited and unreasonable at times, but it has to match what we can afford. Easy loans and credit cards have increased our power to buy more than we can afford.</div></div>
+      <div class="sol-item"><div class="sol-num">4</div><div><strong>Consider special occasions</strong><br>One of the easiest budgeting mistakes to make is only including your regular expenses. Budget for birthday gifts, holidays, and vacations too. Set a max budget of up to 2.5% of your annual income for these expenses.</div></div>
+      <div class="sol-item"><div class="sol-num">5</div><div><strong>Focus on your goals</strong><br>If you have a clear financial goal in mind, it makes budgeting easier. Seeing another movie in the theatre this month might not look so tempting when you picture your goal.</div></div>
+      <div class="sol-item"><div class="sol-num">6</div><div><strong>Pay off any high-interest debt first</strong><br>Personal Loans are often the most expensive ones after credit card debts. Both should be eliminated from your books ASAP. Housing loans are good loans as they are taken for building an asset and also give tax benefits.</div></div>
+    </div>
+    ${budgetDetails}
+  </div>
+
+  <!-- RISK MANAGEMENT -->
+  <div class="section-break"></div>
+  <div class="score-section-hdr risk">
+    <span style="font-size:24px">🏁</span>
+    <div><div style="font-size:11px;letter-spacing:1px;opacity:.8">RISK MANAGEMENT REPORT</div><div style="font-size:16px;font-weight:900">Your Risk Management Score is ${risk}%!</div></div>
+    <div class="section-score">${risk}%</div>
+  </div>
+  <div class="body-pad">
+    <div style="text-align:center;margin:12px 0;font-size:13px;font-weight:700">Financial Protection Status</div>
+    <div style="background:linear-gradient(90deg,#EF4444 0%,#F97316 40%,#22C55E 100%);height:14px;border-radius:7px;position:relative;margin:8px 0">
+      <div style="position:absolute;top:50%;left:${risk}%;transform:translate(-50%,-50%);width:18px;height:18px;background:#fff;border:3px solid #DC2626;border-radius:50%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#666;margin-bottom:14px"><span>Need Help</span><span>Risky</span><span>Normal</span></div>
+    <div class="analysis-box"><div class="analysis-title">Analysis</div><p>Individuals are exposed to a range of risks in their lives. They may become disabled, suffer a prolonged illness, die prematurely, or outlive their resources. All of these risks have two things in common. They are typically random, and they can result in financial hardship without an appropriate risk management strategy. To protect against unexpected financial hardships, risks must be identified and managed well. This section will guide you on what are the probable risks you have and how to manage them.</p></div>
+    <div class="solutions-box"><div class="solutions-title">Solutions</div>
+      <div class="sol-subtitle">Here's how you can get a 100% on your Risk Management Score</div>
+      <div class="sol-item"><div class="sol-num">1</div><div><strong>Financial risks</strong><br>Financial risks can erode the savings and wealth that we build over a period of time. The riskiest financial emergencies can be health expenses, loss of income, premature death and disability risk. The priority of protection: 1. Health insurance 2. Term insurance 3. Emergency fund 4. Disability insurance.</div></div>
+      <div class="sol-item"><div class="sol-num">2</div><div><strong>Emergency fund</strong><br>We highly recommend that 15% of your annual income should be kept aside for risk management. You should ensure that you have health insurance, a term plan and a disability plan from this budget. If you don't have an emergency fund, start a SIP to build one by at least the next 1-2 years.</div></div>
+      <div class="sol-item"><div class="sol-num">3</div><div><strong>Alternate income</strong><br>The best way to protect yourself from an unexpected job loss is to find an alternate source of income. Perhaps you can start up a side business doing something you enjoy in your free time. Second income can definitely help you minimise your financial risks overall.</div></div>
+    </div>
+    ${riskDetails}
+  </div>
+
+  <!-- WEALTH MANAGEMENT -->
+  <div class="section-break"></div>
+  <div class="score-section-hdr wealth">
+    <span style="font-size:24px">🏁</span>
+    <div><div style="font-size:11px;letter-spacing:1px;opacity:.8">WEALTH MANAGEMENT REPORT</div><div style="font-size:16px;font-weight:900">Your Wealth Management Score is ${wealth}%!</div></div>
+    <div class="section-score">${wealth}%</div>
+  </div>
+  <div class="body-pad">
+    <div class="stat-row">
+      <div class="stat-item"><div class="lbl">Asset Portfolio Mix</div><span class="badge" style="background:${assetStatus?'#DCFCE7':'#FEE2E2'};color:${assetStatus?'#166534':'#991B1B'}">${assetStatus?'STATUS: Healthy':'STATUS: Unhealthy'}</span></div>
+      <div class="stat-item"><div class="lbl">Habit Score</div><span class="badge" style="background:${state.wealth.sip==='yes'&&state.wealth.savings==='yes'?'#DCFCE7':'#FEE2E2'};color:${state.wealth.sip==='yes'&&state.wealth.savings==='yes'?'#166534':'#991B1B'}">${state.wealth.sip==='yes'&&state.wealth.savings==='yes'?'STATUS: Healthy':'STATUS: Unhealthy'}</span></div>
+    </div>
+    <div class="analysis-box"><div class="analysis-title">Analysis</div><p>Wealth management is the process of active management of one's wealth to preserve and grow it, as necessary. This is done by identification of opportunities and executing financial goals including short-term and long-term. Having a Wealth Manager to help you is a good advantage. Basically, wealth management has 3 different approaches: Objective 1: Preserving existing wealth. Objective 2: Aggressively grow wealth. Objective 3: Hybrid model of both. In short, have a well-planned investment strategy, and take the help of a wealth manager if you need to.</p></div>
+    <div class="solutions-box"><div class="solutions-title">Solutions</div>
+      <div class="sol-subtitle">Here's how you can get a 100% on your Wealth Management Score</div>
+      <div class="sol-item"><div class="sol-num">1</div><div><strong>Pay yourself first</strong><br>Pay yourself first means that you are making your savings goals your #1 priority. Before you pay any bills or address any of your expenses, you set aside money for your savings. We recommend you pay yourself 15% of your income first every month.</div></div>
+      <div class="sol-item"><div class="sol-num">2</div><div><strong>Pay off debts</strong><br>Wealth and debt are interlinked. Debt, whether it's credit card debt, mortgage debt, Personal loan debt or any other kind — can pull you down every time you try to build your fortune. Start by paying off high-interest debt.</div></div>
+      <div class="sol-item"><div class="sol-num">3</div><div><strong>Build an Emergency Fund</strong><br>Wealth creation is effective only after your emergency fund is in place. Financial emergencies can disorient your wealth-building. Build an emergency fund as your backup money to settle surprise expenditures.</div></div>
+    </div>
+    ${wealthDetails}
+    ${wealthAssetsDetail}
+  </div>
+
+  </body></html>`;
+
+
+  // Open report in new tab with Print/Save button — works on local PC and server
+  const printHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Finergy_Report_${state.client.name||'Client'}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .toolbar{position:fixed;top:0;left:0;right:0;background:#1A237E;padding:10px 20px;display:flex;gap:10px;align-items:center;z-index:9999}
+    .toolbar span{color:#F5A623;font-weight:700;font-size:14px;flex:1}
+    .tbtn{border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+    .tbtn-print{background:#F5A623;color:#1A237E}
+    .tbtn-wa{background:#25D366;color:#fff}
+    .content{padding-top:56px}
+    @media print{.toolbar{display:none!important}.content{padding-top:0}@page{margin:0}}
+  </style>
+  </head><body>
+  <div class="toolbar">
+    <span>📊 Finergy Report — ${state.client.name||'Client'}</span>
+    <button class="tbtn tbtn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  </div>
+  <div class="content">${reportHTML}</div>
+  </body></html>`;
+
+  const blob=new Blob([printHTML],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  btn.textContent='📄 Download PDF Report';
+  btn.disabled=false;
+  if(!win){
+    alert('Popup blocked!\n\nPlease allow popups for this page:\n1. Click the popup blocked icon in address bar\n2. Select "Always allow"\n3. Click the button again');
+  }
+}
+
+function shareWA(){
+  const {finergy}=state.scores;
+  const name=state.client.name;
+  const phone=state.client.mobile.replace(/\D/g,'');
+  const msg=`Hi ${name}! 👋\n\nYour Finergy Score from Finlogin Advisory is *${finergy}%*.\n\nYour Financial Health Report has been prepared. Our advisor will share the detailed action plan within 48 hours.\n\nFor any queries, please contact us.\n\n— Finlogin Advisory Team`;
+  const url=phone?`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+}
+</script>
+</body>
+</html>
